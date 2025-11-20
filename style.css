@@ -18,6 +18,21 @@ body {
     font-family: var(--font-principal);
     color: var(--color-texto);
     line-height: 1.6;
+    top: 0 !important; /* Asegura que el body no tenga margen superior por el banner de Google Translate */
+}
+
+/* Oculta la barra superior y el widget flotante de Google Translate en toda la página */
+.goog-te-banner-frame.skiptranslate,
+.goog-te-menu-frame,
+#goog-gt-tt,
+.goog-te-balloon-frame,
+.goog-te-gadget-simple {
+  display: none !important;
+}
+
+/* Oculta el contenedor que Google inyecta arriba del body */
+body > .skiptranslate {
+  display: none !important;
 }
 
 .container {
@@ -638,6 +653,7 @@ body {
   .form-row.half > * { width: 100%; }
   #google_translate_element { max-width: 95%; }
 }
+
 /* ======== SECCIÓN 5: LLAMADA A LA ACCIÓN FINAL (CTA) ======== */
 .cta {
     padding: 6rem 0;
@@ -2289,113 +2305,34 @@ html[data-theme="dark"] .lang-dropdown {
   .container { padding-left: 12px; padding-right: 12px; }
 }
 
-/* MOBILE: colocar toggle de tema en esquina superior derecha y mover selector de idioma debajo del botón "Contáctenos" */
+/* MOBILE: traductor y modo oscuro juntos, alineados horizontalmente y a la izquierda */
 @media (max-width: 768px) {
-  /* Fijar el toggle en la esquina superior derecha del viewport (por encima de todo) */
-  .theme-toggle {
-    position: fixed !important;
-    top: 12px !important;
-    right: 12px !important;
-    z-index: 2000 !important;
-    /* mantener tamaño y apariencia, sólo cambiar posicionamiento */
-  }
-
-  /* Asegurar espacio superior para que el contenido no quede debajo del toggle */
-  .navbar .container {
-    padding-top: 56px; /* suficiente para el toggle fijo */
-    flex-direction: column; /* ya existía, reafirmamos para coherencia */
-    align-items: stretch;
-  }
-
-  /* Forzar que el menú (con el botón "Contáctenos") aparezca antes que el traductor */
-  .navbar-menu { order: 2; width: 100%; }
-
-  /* Colocar el traductor después del menú (visualmente debajo del botón "Contáctenos") */
   .navbar-traductor {
-    order: 3;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
     width: 100%;
-    justify-content: flex-start;
-    margin: 0.75rem 0 0;
-    padding: 0.25rem 0;
+    justify-content: flex-start !important;
+    margin: 0.75rem 0 0 !important;
+    padding: 0.25rem 0 !important;
+    order: 3;
   }
-
-  /* Ajustes visuales del traductor en móvil para que quede alineado con los items del menú */
-  .navbar-traductor .traductor-label { margin-right: 8px; display: inline-block; }
-  #google_translate_element { max-width: 160px; margin-left: 8px; }
-
-  /* Si el selector personalizado existe, asegurar que se comporte bien a 100% ancho */
-  .custom-lang-select { max-width: 100%; }
-
-  /* Pequeño ajuste: asegurar que el navbar no encime el logo al cambiar el flow */
-  .navbar-logo-img { margin-bottom: 12px; }
-}
-
-/* Media queries para reseñas en móviles */
-@media (max-width: 768px) {
-  .resenas-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-    padding: 0 12px;
+  .theme-toggle {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    z-index: auto !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    flex-shrink: 0;
   }
-
-  .resena-card {
-    padding: 16px;
-    border-radius: 12px;
+  .custom-lang-select {
+    max-width: 100%;
+    flex-shrink: 1;
   }
-
-  .resena-header {
-    gap: 12px;
-  }
-
-  .resena-avatar {
-    width: 48px;
-    height: 48px;
-    font-size: 18px;
-  }
-
-  .resena-nombre {
-    font-size: 16px;
-  }
-
-  .resena-ubicacion {
-    font-size: 12px;
-  }
-
-  .resena-texto {
-    font-size: 14px;
-    line-height: 1.5;
-  }
-
-  .resena-fecha {
-    font-size: 12px;
-  }
-
-  .resenas-filtros {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  .filtro-btn {
-    padding: 8px 12px;
-    font-size: 13px;
-  }
-}
-
-@media (max-width: 480px) {
-  .resena-card {
-    padding: 12px;
-  }
-
-  .resena-texto {
-    font-size: 13px;
-    line-height: 1.4;
-  }
-
-  .resena-avatar {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
+  .navbar .container {
+    padding-top: 0 !important;
   }
 }
 

@@ -358,6 +358,26 @@
         }
       }
 
+      /* Ajuste específico SOLO para este archivo: separación de botones flotantes en móviles */
+      @media (max-width: 768px) {
+        .boton-flotante {
+          bottom: 120px !important; /* Más arriba para evitar colisión */
+          right: 16px !important;
+        }
+        .whatsapp-float {
+          bottom: 32px !important; /* Un poco más arriba para dejar espacio extra */
+          right: 16px !important;
+        }
+      }
+      @media (max-width: 480px) {
+        .boton-flotante {
+          bottom: 110px !important;
+        }
+        .whatsapp-float {
+          bottom: 20px !important;
+        }
+      }
+
       .propiedades-carousel .propiedad-card,
       .propiedades-carousel .propiedad-card * {
         -webkit-font-smoothing: antialiased;
@@ -1158,7 +1178,7 @@
     <!--mauser del boton flotante S-->
     <a href="index.html" class="boton-flotante" aria-label="Ir a la página principal">
       <span class="notranslate" translate="no">S</span>
-    </a>
+    </a> 
 
 </body>
 </html>

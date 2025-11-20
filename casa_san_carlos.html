@@ -12,7 +12,6 @@
     <title>Detalle de Propiedad - Structura</title>
     
     <link rel="stylesheet" href="style.css">
-    <!-- Replaced/updated local styles to fix form, mapa y layout responsive -->
     <style>
       /* inline fixes */
       :root { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
@@ -54,6 +53,11 @@
         .navbar .container{ padding-top:48px; } /* espacio para toggle */
         iframe{ width:100% !important; max-width:100%; height:320px !important; }
       }
+
+      /* Oculta el widget de Google Translate en todas resoluciones */
+      #google_translate_element .goog-te-gadget-simple { display: none !important; }
+      .goog-te-banner-frame.skiptranslate { display: none !important; }
+      body { top: 0 !important; }
     </style>
 </head>
 
@@ -75,7 +79,14 @@
 <div class="navbar-traductor">
   <label for="google_translate_element" class="traductor-label">🌐 Idioma:</label>
   <div id="google_translate_element"></div>
-</div>
+
+                <!-- Botón deslizante para modo oscuro -->
+                <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar modo oscuro" title="Alternar modo oscuro">
+                    <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+                    <span class="toggle-circle" aria-hidden="true"></span>
+                    <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
+                </button>
+            </div>
 
 <!--menu de la cosa esa del navbar-->
             <nav class="navbar-menu">
@@ -85,13 +96,6 @@
 	            <a href="nosotros.html" class="nav-link">Nosotros</a>
 	            <a href="resenas.html" class="nav-link">Reseñas</a>
 	            <a href="contacto.html" class="nav-button">Contáctenos</a>
-
-                <!-- Botón deslizante para modo oscuro -->
-                <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar modo oscuro" title="Alternar modo oscuro">
-                    <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
-                    <span class="toggle-circle" aria-hidden="true"></span>
-                    <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
-                </button>
             </nav>
         </div>
     </header>
@@ -110,7 +114,7 @@
                         <img src="images/sancarlos-1.jpg" alt="Casa San Carlos">
                 </div>
 
-<!--mauser de la miniaturas-->
+<!--mauser de las miniaturas-->
 <div class="gallery-thumbnails">
   <img src="miniaturas/casa san carlos/imagen 1.png" data-full="miniaturas/Casa el pilar/imagen 1.jpeg" alt="Miniatura 1" class="miniatura">
   <img src="miniaturas/casa san carlos/imagen 2.jpg" data-full="miniaturas/Casa el pilar/imagen 2.jpeg" alt="Miniatura 2" class="miniatura">

@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reseñas - Structura</title>
+    
+    <script>
+        (function(){
+            try {
+                var saved = localStorage.getItem('theme');
+                if (saved === 'dark') document.documentElement.setAttribute('data-theme','dark');
+                else if (!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.setAttribute('data-theme','dark');
+                }
+            } catch(e) { /* no-op */ }
+        })();
+    </script>
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+      /* Estilos locales para página de reseñas */
+      .resenas-container { padding: 6rem 0; }
+      .resenas-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+        gap: 2rem; 
+        margin-top: 3rem;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .resena-card {
+        background-color: var(--color-blanco);
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+        box-sizing: border-box;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+      .resena-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
+      .resena-card.hidden { opacity: 0; pointer-events: none; display: none; }
+      
+      .resena-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+      .resena-avatar { 
+        width: 50px; 
+        height: 50px; 
+        border-radius: 50%; 
+        background: linear-gradient(135deg, var(--color-naranja), #ff8a00); 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: white; 
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .resena-autor { flex: 1; min-width: 0; }
+      .resena-autor h4 { margin: 0; font-size: 1.1rem; color: var(--color-texto); word-break: break-word; }
+      .resena-autor p { margin: 0.25rem 0 0; font-size: 0.9rem; color: var(--color-gris); }
+      .resena-estrellas { display: flex; gap: 2px; margin-bottom: 1rem; }
+      .resena-estrellas i { color: #ffc107; font-size: 1rem; flex-shrink: 0; }
+      .resena-texto { font-size: 1rem; color: var(--color-gris); line-height: 1.7; margin-bottom: 1rem; font-style: italic; word-break: break-word; }
+      .resena-fecha { font-size: 0.85rem; color: #aaa; word-break: break-word; }
+
+      /* Filtros */
+      .resenas-filtros {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        justify-content: center;
+        margin: 3rem 0 2rem;
+        padding: 2rem;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        box-sizing: border-box;
+      }
+      
+      .filtro-grupo {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .filtro-label {
+        font-weight: 700;
+        color: var(--color-texto);
+        white-space: nowrap;
+      }
+      
+      .filtro-btn {
+        padding: 8px 16px;
+        border: 2px solid #ddd;
+        border-radius: 20px;
+        background-color: white;
+        color: var(--color-texto);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+      }
+      
+      .filtro-btn:hover {
+        border-color: var(--color-naranja);
+        color: var(--color-naranja);
+      }
+      
+      .filtro-btn.active {
+        background-color: var(--color-naranja);
+        color: white;
+        border-color: var(--color-naranja);
+      }
+
+      .filtro-select {
+        padding: 8px 16px;
+        border: 2px solid #ddd;
+        border-radius: 20px;
+        background-color: white;
+        color: var(--color-texto);
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: border 0.3s, color 0.3s;
+        margin-left: 0.5rem;
+        min-width: 120px;
+        outline: none;
+      }
+      .filtro-select:focus {
+        border-color: var(--color-naranja);
+        color: var(--color-naranja);
+      }
+      
+      html[data-theme="dark"] .resenas-filtros {
+        background-color: #0b0d10;
+      }
+
+      html[data-theme="dark"] .filtro-btn {
+        background-color: var(--color-blanco);
+        border-color: rgba(255,255,255,0.1);
+        color: var(--color-texto);
+      }
+
+      html[data-theme="dark"] .filtro-select {
+        background-color: var(--color-blanco);
+        border-color: rgba(255,255,255,0.1);
+        color: var(--color-texto);
+      }
+
+      /* Formulario de reseña */
+      .resena-form-section { background-color: #f9f9f9; padding: 4rem 0; }
+      .resena-form-container { max-width: 600px; margin: 0 auto; background: var(--color-blanco); padding: 2.5rem; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); box-sizing: border-box; }
+      .form-group-resena { margin-bottom: 1.5rem; }
+      .form-group-resena label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--color-texto); }
+      .form-group-resena input, .form-group-resena textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: var(--font-principal); font-size: 1rem; box-sizing: border-box; }
+      .form-group-resena textarea { min-height: 120px; resize: vertical; }
+      .estrellas-selector { display: flex; gap: 10px; }
+      .estrellas-selector i { font-size: 1.8rem; cursor: pointer; color: #ddd; transition: color 0.2s ease; }
+      .estrellas-selector i:hover, .estrellas-selector i.active { color: #ffc107; }
+      .btn-submit-resena { background-color: var(--color-naranja); color: white; padding: 12px 28px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background 0.3s ease; width: 100%; box-sizing: border-box; }
+      .btn-submit-resena:hover { background-color: #d95f21; }
+      .validation-message { font-size: 0.85rem; color: #e74c3c; margin-top: 0.25rem; display: none; }
+      .validation-message.show { display: block; }
+      .input-error { border-color: #e74c3c !important; }
+
+      /* Equipo */
+      .team-section-extended { padding: 6rem 0; background-color: transparent; }
+      .team-grid-extended { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2.5rem; }
+      .team-card-extended {
+        background-color: var(--color-blanco);
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-align: center;
+      }
+      .team-card-extended:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.12); }
+      .team-image-extended { width: 100%; height: 300px; }
+      .team-image-extended img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+      .team-info-extended { padding: 2rem 1.5rem; }
+      .team-info-extended h4 { font-size: 1.4rem; color: var(--color-texto); margin-bottom: 0.25rem; }
+      .team-info-extended p { font-size: 0.95rem; color: var(--color-naranja); font-weight: 600; margin-bottom: 1rem; }
+      .team-info-extended .bio { font-size: 0.9rem; color: var(--color-gris); line-height: 1.6; margin-bottom: 1.5rem; }
+      .team-social { display: flex; gap: 10px; justify-content: center; }
+      .team-social a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        color: var(--color-naranja);
+        text-decoration: none;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      .team-social a:hover { background-color: var(--color-naranja); color: white; }
+
+      /* Media para pantallas tablets */
+      @media (max-width: 768px) {
+        .resenas-container { padding: 4rem 1rem; }
+        .resenas-grid { 
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+          margin-top: 2rem;
+        }
+        .resena-card { padding: 1.5rem; }
+        .resena-texto { font-size: 0.95rem; line-height: 1.6; }
+        .resena-autor h4 { font-size: 1rem; }
+        .resenas-filtros { 
+          padding: 1.5rem;
+          gap: 1rem;
+        }
+        .filtro-grupo { gap: 0.75rem; }
+        .filtro-btn { padding: 6px 12px; font-size: 0.85rem; }
+        .resena-form-section { padding: 3rem 0; }
+        .resena-form-container { padding: 1.5rem; }
+        .team-grid-extended { grid-template-columns: 1fr; }
+      }
+
+      /* medida para pantallas móviles pequeñas */
+      @media (max-width: 480px) {
+        .resenas-container { padding: 2rem 0.75rem; }
+        .resenas-grid { 
+          grid-template-columns: 1fr;
+          gap: 1rem;
+          margin-top: 1.5rem;
+        }
+        .resena-card { 
+          padding: 1rem;
+          border-radius: 8px;
+        }
+        .resena-header { gap: 0.75rem; }
+        .resena-avatar { 
+          width: 45px;
+          height: 45px;
+          font-size: 16px;
+        }
+        .resena-autor h4 { font-size: 0.95rem; }
+        .resena-texto { 
+          font-size: 0.9rem;
+          line-height: 1.5;
+          margin-bottom: 0.75rem;
+        }
+        .resena-fecha { font-size: 0.8rem; }
+        .resenas-filtros {
+          padding: 1rem 0.75rem;
+          gap: 0.75rem;
+        }
+        .filtro-grupo {
+          gap: 0.5rem;
+          width: 100%;
+          justify-content: flex-start;
+        }
+        .filtro-label { font-size: 0.85rem; }
+        .filtro-btn { 
+          padding: 5px 10px;
+          font-size: 0.8rem;
+        }
+        .resena-form-container { padding: 1rem; }
+        .form-group-resena label { font-size: 0.95rem; }
+        .form-group-resena input, 
+        .form-group-resena textarea { 
+          padding: 8px;
+          font-size: 16px;
+        }
+      }
+
+      /* modo oscuro para formulario y campos */
+      html[data-theme="dark"] .resena-form-section {
+        background-color: transparent;
+      }
+
+      html[data-theme="dark"] .resena-form-container {
+        background-color: #0f1113;
+        color: #f5f6f7;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      }
+
+      html[data-theme="dark"] .form-group-resena label {
+        color: #e6e7e8;
+      }
+
+      html[data-theme="dark"] .form-group-resena input,
+      html[data-theme="dark"] .form-group-resena textarea,
+      html[data-theme="dark"] .resena-form-container select,
+      html[data-theme="dark"] .resena-form-container option {
+        background-color: rgba(255,255,255,0.03);
+        border-color: rgba(255,255,255,0.08);
+        color: #e6e7e8;
+      }
+
+      html[data-theme="dark"] .form-group-resena input::placeholder,
+      html[data-theme="dark"] .form-group-resena textarea::placeholder,
+      html[data-theme="dark"] .resena-form-container select::-ms-value {
+        color: rgba(230,230,230,0.55);
+      }
+
+      html[data-theme="dark"] .validation-message {
+        color: #ffb3b3;
+      }
+
+      html[data-theme="dark"] .input-error {
+        border-color: #ff6b6b !important;
+        box-shadow: 0 0 0 4px rgba(255,107,107,0.06);
+      }
+
+      html[data-theme="dark"] .estrellas-selector i {
+        color: #666;
+      }
+      html[data-theme="dark"] .estrellas-selector i:hover,
+      html[data-theme="dark"] .estrellas-selector i.active {
+        color: #ffc107;
+      }
+
+      html[data-theme="dark"] .btn-submit-resena {
+        background-color: var(--color-naranja);
+        color: white;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+      }
+
+      @media (forced-colors: none) {
+        html[data-theme="dark"] .resena-form-container select {
+          color: #e6e7e8;
+        }
+      }
+
+      /* Corrección overflow en móvil para reseñas */
+      .resenas-grid {
+        /* asegurar que cada tarjeta pueda reducir su altura sin provocar overflow */
+        grid-auto-rows: 1fr;
+      }
+
+      /* Evitar que el contenido de las tarjetas cree scroll interno por comportamiento de grid/flex */
+      .resenas-grid > .resena-card,
+      .resena-card {
+        box-sizing: border-box;
+        min-height: 0; /* importante para que hijos con height:100% no desborden */
+        overflow: visible; /* previene scroll interno no deseado */
+        word-wrap: break-word;
+      }
+
+      /* Forzar quiebre de palabras largas y mejorar legibilidad en párrafos */
+      .resena-texto,
+      .resena-fecha,
+      .resena-autor h4,
+      .resena-autor p {
+        overflow-wrap: break-word;
+        word-break: break-word;
+        hyphens: auto;
+      }
+
+      /* Evitar que el avatar reduzca demasiado y provoque overflow horizontal */
+      .resena-avatar {
+        flex-shrink: 0;
+        min-width: 50px;
+      }
+
+      /* Ajustes responsivos para pantallas pequeñas */
+      @media (max-width: 480px) {
+        .resenas-container { padding-left: 1rem; padding-right: 1rem; }
+        .resenas-grid { gap: 1rem; }
+        .resena-card { padding: 1.25rem; border-radius: 8px; }
+        .resena-texto { font-size: 0.98rem; line-height: 1.6; }
+        /* Asegurar que select/inputs no desborden */
+        .resena-form-container select,
+        .form-group-resena input,
+        .form-group-resena textarea {
+          max-width: 100%;
+          box-sizing: border-box;
+        }
+      }
+
+      /* Inserta justo antes del enlace flotante de WhatsApp (antes de los comentarios del flotante) */
+      /* estilos mínimos para botones Edit / Delete dentro de cada tarjeta */
+.resena-card .card-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
+}
+.resena-card .card-actions button {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: white;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+html[data-theme="dark"] .resena-card .card-actions button {
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.06);
+  color: #e6e7e8;
+}
+.resena-card .card-actions .btn-edit { color: var(--color-naranja); border-color: rgba(255,140,0,0.12); }
+.resena-card .card-actions .btn-delete { color: #c0392b; border-color: rgba(192,57,43,0.08); }
+
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <a href="index.html" class="navbar-logo-img">
+                <img src="images/STRUCTURA LOGO HORIZONTAL NEGRO@3x.png" alt="Logo Structura">
+            </a>
+
+            <!--masuer del selector del traductor de google-->
+            <div class="navbar-traductor">
+              <label for="google_translate_element" class="traductor-label">🌐 Idioma:</label>
+              <div id="google_translate_element"></div>
+            </div>
+
+            <!--menu del navar naranjuita-->
+            <nav class="navbar-menu">
+                <a href="index.html" class="nav-link">Inicio</a>
+                <a href="propiedades.html" class="nav-link">Propiedades</a>
+                <a href="exclusivos.html" class="nav-link">Exclusivos</a>
+                <a href="nosotros.html" class="nav-link">Nosotros</a>
+                <a href="resenas.html" class="nav-link active">Reseñas</a>
+                <a href="contacto.html" class="nav-button">Contáctenos</a>
+
+                <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar modo oscuro" title="Alternar modo oscuro">
+                    <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+                    <span class="toggle-circle" aria-hidden="true"></span>
+                    <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- SECCIÓN: RESEÑAS Y TESTIMONIOS -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Reseñas y Testimonios</h1>
+            <p>Descubre lo que nuestros clientes dicen sobre su experiencia con Structura.</p>
+        </div>
+    </section>
+
+    <section class="resenas">
+  <div class="container">
+    <div class="titulo-seccion">
+      <span class="subtitulo-naranja">TESTIMONIOS</span>
+      <h2>Lo que Dicen Nuestros Clientes</h2>
+    </div>
+
+    <!-- Filtros -->
+    <div class="resenas-filtros">
+      <div class="filtro-grupo">
+        <label class="filtro-label" for="filtroSentimiento">Comentarios:</label>
+        <select id="filtroSentimiento" class="filtro-select">
+          <option value="all">Todos</option>
+          <option value="positiva">✅ Positivas</option>
+          <option value="negativa">⚠️ Críticas</option>
+        </select>
+      </div>
+      <div class="filtro-grupo">
+        <label class="filtro-label" for="filtroCalificacion">Calificación:</label>
+        <select id="filtroCalificacion" class="filtro-select">
+          <option value="all">Todas</option>
+          <option value="5">⭐ 5 Estrellas</option>
+          <option value="4">⭐ 4 Estrellas</option>
+          <option value="3">⭐ 3 Estrellas</option>
+          <option value="2">⭐ 2 Estrellas</option>
+          <option value="1">⭐ 1 Estrella</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Grid de reseñas -->
+    <div class="resenas-grid" id="resenasGrid">
+                <!-- Reseña 1: 5 Estrellas - Positiva -->
+                <div class="resena-card" data-calificacion="5" data-sentimiento="positiva">
+                    <div class="resena-header">
+                        <div class="resena-avatar">JM</div>
+                        <div class="resena-autor">
+                            <h4>José María López</h4>
+                            <p>Cliente Verificado</p>
+                        </div>
+                    </div>
+                    <div class="resena-estrellas">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="resena-texto">"Structura superó todas mis expectativas. El equipo fue profesional, atento y cumplieron cada promesa. Mi casa es una joya arquitectónica que va a perdurar generaciones."</p>
+                    <p class="resena-fecha">Hace 3 meses · Casa El Pilar</p>
+                </div>
+
+                <!-- Reseña 2: 5 Estrellas - Positiva -->
+                <div class="resena-card" data-calificacion="5" data-sentimiento="positiva">
+                    <div class="resena-header">
+                        <div class="resena-avatar" style="background: linear-gradient(135deg, #4CAF50, #45a049);">MC</div>
+                        <div class="resena-autor">
+                            <h4>María Carmen Rodríguez</h4>
+                            <p>Cliente Verificado</p>
+                        </div>
+                    </div>
+                    <div class="resena-estrellas">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="resena-texto">"Desde el primer contacto hasta la entrega de llaves, todo fue perfecto. El diseño respeta la arquitectura colonial pero con todas las comodidades modernas. ¡Recomiendo ampliamente!"</p>
+                    <p class="resena-fecha">Hace 2 meses · Casa Entre Ruinas</p>
+                </div>
+
+                <!-- Reseña 3: 4.5 Estrellas - Positiva -->
+                <div class="resena-card" data-calificacion="4" data-sentimiento="positiva">
+                    <div class="resena-header">
+                        <div class="resena-avatar" style="background: linear-gradient(135deg, #2196F3, #1976D2);">RF</div>
+                        <div class="resena-autor">
+                            <h4>Roberto Fernández</h4>
+                            <p>Cliente Verificado</p>
+                        </div>
+                    </div>
+                    <div class="resena-estrellas">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p class="resena-texto">"Excelente calidad de construcción. El equipo fue muy profesional y los detalles artesanales son impresionantes. Un poco más de comunicación durante el proceso habría sido ideal, pero el resultado final vale cada peso."</p>
+                    <p class="resena-fecha">Hace 1 mes · Casa San Carlos</p>
+                </div>
+
+                <!-- Reseña 4: 5 Estrellas - Positiva -->
+                <div class="resena-card" data-calificacion="5" data-sentimiento="positiva">
+                    <div class="resena-header">
+                        <div class="resena-avatar" style="background: linear-gradient(135deg, #9C27B0, #7B1FA2);">AP</div>
+                        <div class="resena-autor">
+                            <h4>Ana Patricia Morales</h4>
+                            <p>Cliente Verificado</p>
+                        </div>
+                    </div>
+                    <div class="resena-estrellas">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="resena-texto">"Mi familia ahora vive en un hogar que es una verdadera obra de arte. Structura no solo construye casas, crea espacios donde se tejen historias. Estoy eternamente agradecida."</p>
+                    <p class="resena-fecha">Hace 2 semanas · Casa Ocasus</p>
+                </div>
+
+                <!-- Reseña 5: 3 Estrellas - Negativa -->
+                <div class="resena-card" data-calificacion="3" data-sentimiento="negativa">
+                    <div class="resena-header">
+                        <div class="resena-avatar" style="background: linear-gradient(135deg, #FF9800, #E65100);">DG</div>
+                        <div class="resena-autor">
+                            <h4>Diego García</h4>
+                            <p>Cliente Verificado</p>
+                        </div>
+                    </div>
+                    <div class="resena-estrellas">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-o"></i>
+                        <i class="fas fa-star-o"></i>
+                    </div>
+                    <p class="resena-texto">"La propiedad es hermosa, pero el proceso fue más lento de lo esperado. Tuvimos algunos retrasos en la entrega y ciertos detalles que mencionamos no se implementaron como se acordó. Aún así, la casa es de buena calidad."</p>
+                    <p class="resena-fecha">Hace 1 mes · Casa Reliqua</p>
+                </div>
+
+                <!-- Reseña 6: 5 Estrellas - Positiva -->
+                <div class="resena-card" data-calificacion="5" data-sentimiento="positiva">
+                    <div class="resena-header">
+                        <div class="resena-avatar" style="background: linear-gradient(135deg, #00BCD4, #0097A7);">LC</div>
+                        <div class="resena-autor">
+                            <h4>Laura Chávez</h4>
+                            <p>Cliente Verificado</p>
+                        </div>
+                    </div>
+                    <div class="resena-estrellas">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="resena-texto">"Los acabados y detalles artesanales son de primer nivel. Cada espacio está pensado para vivencia, no solo para estar. El equipo directivo merece todos los reconocimientos."</p>
+                    <p class="resena-fecha">Ayer · Casa La Reunión</p>
+                </div>
+            </div>
+    <div style="text-align:center; margin-top:2rem;">
+        <button id="toggleResenasBtn" class="btn-submit-resena" style="max-width:320px;display:none;">Ver todos los comentarios</button>
+    </div>
+  </div>
+</section>
+
+    <!-- SECCIÓN: FORMULARIO PARA DEJAR RESEÑA -->
+    <section class="resena-form-section">
+        <div class="container">
+            <div class="titulo-seccion">
+                <span class="subtitulo-naranja">COMPARTE TU EXPERIENCIA</span>
+                <h2>Deja Tu Reseña</h2>
+            </div>
+
+            <div class="resena-form-container">
+                <form id="reviewForm" class="review-form">
+                    <div class="form-group-resena">
+                        <label for="nombre">Nombre Completo</label>
+                        <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
+                        <div class="validation-message" data-field="nombre">Por favor ingresa tu nombre completo.</div>
+                    </div>
+
+                    <div class="form-group-resena">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="tu@email.com" required>
+                        <div class="validation-message" data-field="email">Por favor ingresa un email válido.</div>
+                    </div>
+
+                    <div class="form-group-resena">
+                        <label for="propiedad">¿Qué propiedad visitaste?</label>
+                        <select id="propiedad" name="propiedad" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-family: var(--font-principal); font-size: 1rem;">
+                            <option value="">-- Selecciona una propiedad --</option>
+                            <option value="Casa El Pilar">Casa El Pilar</option>
+                            <option value="Casa Entre Ruinas">Casa Entre Ruinas</option>
+                            <option value="Casa San Carlos">Casa San Carlos</option>
+                            <option value="Casa Ocasus">Casa Ocasus</option>
+                            <option value="Casa Reliquia">Casa Reliqua</option>
+                            <option value="Casa La Reunión">Casa La Reunión</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group-resena">
+                        <label>Calificación (estrellas)</label>
+                        <div class="estrellas-selector" id="estrellasSelector">
+                            <i class="fas fa-star" data-rating="1" title="1 estrella"></i>
+                            <i class="fas fa-star" data-rating="2" title="2 estrellas"></i>
+                            <i class="fas fa-star" data-rating="3" title="3 estrellas"></i>
+                            <i class="fas fa-star" data-rating="4" title="4 estrellas"></i>
+                            <i class="fas fa-star" data-rating="5" title="5 estrellas"></i>
+                        </div>
+                        <input type="hidden" id="rating" name="rating" value="0">
+                        <div class="validation-message" data-field="rating">Por favor selecciona una calificación.</div>
+                    </div>
+
+                    <div class="form-group-resena">
+                        <label for="comentario">Tu Reseña</label>
+                        <textarea id="comentario" name="comentario" placeholder="Comparte tu experiencia con Structura..." required></textarea>
+                        <div class="validation-message" data-field="comentario">Por favor escribe tu reseña (mínimo 20 caracteres).</div>
+                    </div>
+
+                    <button type="submit" class="btn-submit-resena">Enviar Reseña</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN: EQUIPO EXTENDIDO -->
+    <section class="team-section-extended">
+        <div class="container">
+            <div class="titulo-seccion">
+                <span class="subtitulo-naranja">CONOCE AL EQUIPO</span>
+                <h2>Nuestros Profesionales</h2>
+            </div>
+
+            <div class="team-grid-extended">
+                <!-- Miembro 1 -->
+                <div class="team-card-extended">
+                    <div class="team-image-extended">
+                        <img src="images/arq-jose-miguel-asturias.jpg" alt="Arquitecto Jose Miguel Asturias">
+                    </div>
+                    <div class="team-info-extended">
+                        <h4>Arq. Jose Miguel Asturias</h4>
+                        <p>CEO & Director General</p>
+                        <p class="bio">17+ años de experiencia en diseño y construcción. Apasionado por preservar la arquitectura colonial antigüeña con innovación moderna.</p>
+                        <div class="team-social">
+                            <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" title="Email"><i class="fas fa-envelope"></i></a>
+                            <a href="#" title="Teléfono"><i class="fas fa-phone"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Miembro 2 -->
+                <div class="team-card-extended">
+                    <div class="team-image-extended">
+                        <img src="images/arq-luis-quisque.jpg" alt="Arquitecto Luis José Quisque">
+                    </div>
+                    <div class="team-info-extended">
+                        <h4>Arq. Luis José Quisque</h4>
+                        <p>Gerente General Operativo</p>
+                        <p class="bio">Especialista en supervisión de proyectos y gestión operativa. Garantiza que cada detalle cumpla con los más altos estándares de calidad.</p>
+                        <div class="team-social">
+                            <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" title="Email"><i class="fas fa-envelope"></i></a>
+                            <a href="#" title="Teléfono"><i class="fas fa-phone"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Miembro 3 -->
+                <div class="team-card-extended">
+                    <div class="team-image-extended">
+                        <img src="images/ing-marlon-marroquin.jpg" alt="Ingeniero Marlon Marroquín">
+                    </div>
+                    <div class="team-info-extended">
+                        <h4>Ing. Marlon Marroquín</h4>
+                        <p>Gerente General Administrativo</p>
+                        <p class="bio">Experto en administración de proyectos inmobiliarios. Responsable de asegurar procesos fluidos y transparentes con cada cliente.</p>
+                        <div class="team-social">
+                            <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#" title="Email"><i class="fas fa-envelope"></i></a>
+                            <a href="#" title="Teléfono"><i class="fas fa-phone"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!--parte inferior de la pagina-->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <img src="images/STRUCTURA LOGO VERTICAL BLANCO@3x.png" alt="Logo Structura Blanco" class="footer-logo">
+                <p>Diseño y construcción de casas estilo colonial en Antigua Guatemala.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Enlaces Rápidos</h4>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="propiedades.html">Propiedades</a></li>
+                    <li><a href="exclusivos.html">Exclusivos</a></li>
+                    <li><a href="nosotros.html">Nosotros</a></li>
+                    <li><a href="resenas.html">Reseñas</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contáctenos</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Antigua Guatemala, Sacatepéquez</li>
+                    <li><i class="fas fa-phone"></i> (+502) 7832-9758</li>
+                    <li><i class="fas fa-envelope"></i> informacion@structura.com.gt</li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Síganos</h4>
+                <!--redes de la empresa-->
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Structura. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="js/theme.js"></script>
+
+    <!--mauser del script del traductor de google-->
+    <script type="text/javascript">
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+          pageLanguage: 'es',
+          includedLanguages: 'en,zh-CN,hi,es,ar,bn,pt,ru,ja,fr',
+          layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        }, 'google_translate_element');
+      }
+    </script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+      (function () {
+        const match = document.cookie.match(/googtrans=\/[a-zA-Z-]+\/([a-zA-Z-]+)/);
+        if (match) {
+          const lang = match[1];
+          document.cookie = `googtrans=/es/${lang};path=/`;
+        }
+      })();
+    </script>
+
+    <!--nuevo script unificado que añade persistencia por usuario y control de edición/eliminación solo para el autor, en pocas palabras mas chingon >:D -->
+<script>
+(function(){
+  const STORAGE_KEY = 'structura_comments';
+  const USER_TOKEN_KEY = 'structura_user_token';
+
+  // obtiene o genera token de usuario (persistente en este navegador)
+  function getUserToken() {
+    let t = localStorage.getItem(USER_TOKEN_KEY);
+    if (!t) {
+      t = 'u_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+      localStorage.setItem(USER_TOKEN_KEY, t);
+    }
+    return t;
+  }
+  const userToken = getUserToken();
+
+  // storage helpers
+  function loadComments() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    } catch(e) { return []; }
+  }
+  function saveComments(arr) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+  }
+
+  // escape simple para evitar inyección de HTML
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[s]);
+  }
+
+  function starsHtmlFor(r) {
+    let html = '';
+    for (let i = 1; i <= 5; i++) {
+      if (i <= r) html += '<i class="fas fa-star"></i>';
+      else html += '<i class="fas fa-star" style="color:#ddd"></i>';
+    }
+    return html;
+  }
+
+  // crea tarjeta DOM a partir de objeto comment
+  function createCardFromComment(c) {
+    const card = document.createElement('div');
+    card.className = 'resena-card';
+    card.dataset.calificacion = c.rating;
+    card.dataset.sentimiento = (c.rating >= 4) ? 'positiva' : 'negativa';
+    card.dataset.author = c.author || '';
+    card.dataset.cid = c.id || '';
+
+    card.innerHTML = ''
+      + '<div class="resena-header">'
+      +   `<div class="resena-avatar">${escapeHtml(c.initials || 'U')}</div>`
+      +   '<div class="resena-autor">'
+      +     `<h4>${escapeHtml(c.nombre)}</h4>`
+      +     '<p>Cliente Verificado</p>'
+      +   '</div>'
+      + '</div>'
+      + `<div class="resena-estrellas">${starsHtmlFor(c.rating)}</div>`
+      + `<p class="resena-texto">"${escapeHtml(c.comentario)}"</p>`
+      + `<p class="resena-fecha">${escapeHtml(c.fecha || 'Hace ahora')} · ${escapeHtml(c.propiedad || 'Otro')}</p>`;
+
+    // solo añade botones si el autor coincide con el token actual
+    if (c.author === userToken) addCardActions(card, true);
+    return card;
+  }
+
+  // añade acciones (editar / borrar) y listeners; owned = boolean para seguridad
+  function addCardActions(card, owned) {
+    if (!owned) return;
+    if (card.querySelector('.card-actions')) return;
+    const actions = document.createElement('div');
+    actions.className = 'card-actions';
+    actions.innerHTML = '<button class="btn-edit" type="button" aria-label="Editar reseña">Editar</button>'
+                      + '<button class="btn-delete" type="button" aria-label="Borrar reseña">Borrar</button>';
+    card.appendChild(actions);
+
+    actions.querySelector('.btn-delete').addEventListener('click', function(){
+      if (!confirm('¿Seguro que desea eliminar esta reseña?')) return;
+      const cid = card.dataset.cid;
+      // eliminar del storage si existe
+      if (cid) {
+        const arr = loadComments().filter(x => x.id !== cid);
+        saveComments(arr);
+      }
+      card.remove();
+    });
+
+    actions.querySelector('.btn-edit').addEventListener('click', function(){
+      const nombreEl = card.querySelector('.resena-autor h4');
+      const textoEl = card.querySelector('.resena-texto');
+      const estrellasEl = card.querySelector('.resena-estrellas');
+      const propiedadEl = card.querySelector('.resena-fecha');
+
+      const currentName = nombreEl ? nombreEl.textContent.trim() : '';
+      const currentText = textoEl ? textoEl.textContent.replace(/^"|"$/g,'').trim() : '';
+      const currentRating = parseInt(card.dataset.calificacion) || 5;
+
+      const newName = prompt('Editar nombre:', currentName) || currentName;
+      const newText = prompt('Editar reseña (mínimo 20 caracteres):', currentText) || currentText;
+      let newRating = parseInt(prompt('Editar calificación (1-5):', String(currentRating)) || String(currentRating), 10);
+      if (isNaN(newRating) || newRating < 1) newRating = 1;
+      if (newRating > 5) newRating = 5;
+
+      // aplicar cambios en DOM
+      if (nombreEl) nombreEl.textContent = newName;
+      if (textoEl) textoEl.textContent = '"' + newText + '"';
+      if (estrellasEl) estrellasEl.innerHTML = starsHtmlFor(newRating);
+      card.dataset.calificacion = newRating;
+      card.dataset.sentimiento = (newRating >= 4) ? 'positiva' : 'negativa';
+      if (propiedadEl) {
+        const parts = propiedadEl.textContent.split('·');
+        const right = parts[1] ? parts[1].trim() : '';
+        propiedadEl.textContent = 'Editada · ' + (right || '');
+      }
+
+      // actualizar en storage si tiene cid
+      const cid = card.dataset.cid;
+      if (cid) {
+        const arr = loadComments();
+        const idx = arr.findIndex(x => x.id === cid);
+        if (idx !== -1) {
+          arr[idx].nombre = newName;
+          arr[idx].comentario = newText;
+          arr[idx].rating = newRating;
+          arr[idx].propiedad = right || arr[idx].propiedad;
+          arr[idx].fecha = 'Editada';
+          saveComments(arr);
+        }
+      }
+    });
+  }
+
+  // renderiza todos los comentarios almacenados (los agrega al inicio del grid)
+  function renderStoredComments() {
+    const arr = loadComments();
+    if (!arr || !arr.length) return;
+    const grid = document.getElementById('resenasGrid');
+    // añadir desde más recientes primero
+    arr.slice().reverse().forEach(c => {
+      const card = createCardFromComment(c);
+      // insertar al inicio para que se vean arriba
+      grid.insertBefore(card, grid.firstChild);
+    });
+  }
+
+  // init: añadir botones solo en tarjetas propias ya presentes (si alguna tarjeta está marcada con data-author)
+  function initExistingOwnedCards() {
+    document.querySelectorAll('.resena-card').forEach(card => {
+      if (card.dataset.author && card.dataset.author === userToken) addCardActions(card, true);
+    });
+  }
+
+  // inicializar comportamiento de estrellas en formulario y validaciones
+  function initFormBehavior() {
+    const estrellasSelector = document.getElementById('estrellasSelector');
+    const ratingInput = document.getElementById('rating');
+    if (estrellasSelector && ratingInput) {
+      const fStars = estrellasSelector.querySelectorAll('i');
+      fStars.forEach((star, idx) => {
+        star.addEventListener('click', () => {
+          const rating = parseInt(star.dataset.rating,10);
+          ratingInput.value = rating;
+          fStars.forEach((s, i) => s.classList.toggle('active', i < rating));
+          clearValidationMessage('rating');
+        });
+        star.addEventListener('mouseover', () => {
+          const rating = parseInt(star.dataset.rating,10);
+          fStars.forEach((s, i) => s.style.color = (i < rating ? '#ffc107' : '#ddd'));
+        });
+      });
+      estrellasSelector.addEventListener('mouseleave', () => {
+        const currentRating = parseInt(ratingInput.value) || 0;
+        fStars.forEach((s, i) => s.style.color = (i < currentRating ? '#ffc107' : '#ddd'));
+      });
+    }
+
+    // validaciones en tiempo real
+    const nombreInput = document.getElementById('nombre');
+    const emailInput = document.getElementById('email');
+    const comentarioInput = document.getElementById('comentario');
+    if (nombreInput) nombreInput.addEventListener('input', function() { if (this.value.trim().length > 2) clearValidationMessage('nombre'); });
+    if (emailInput) emailInput.addEventListener('input', function() { const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; if (emailRegex.test(this.value)) clearValidationMessage('email'); });
+    if (comentarioInput) comentarioInput.addEventListener('input', function() { if (this.value.trim().length >= 20) clearValidationMessage('comentario'); });
+
+    // form submit: validar, persistir, y renderizar
+    const form = document.getElementById('reviewForm');
+    const grid = document.getElementById('resenasGrid');
+    if (!form || !grid) return;
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      let isValid = true;
+      const nombre = (document.getElementById('nombre').value || '').trim();
+      const email = (document.getElementById('email').value || '').trim();
+      const propiedad = (document.getElementById('propiedad').value || '').trim();
+      const rating = parseInt((document.getElementById('rating').value || '0'), 10);
+      const comentario = (document.getElementById('comentario').value || '').trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (nombre.length < 3) { showValidationMessage('nombre'); isValid = false; }
+      if (!emailRegex.test(email)) { showValidationMessage('email'); isValid = false; }
+      if (!rating || rating < 1) { showValidationMessage('rating'); isValid = false; }
+      if (comentario.length < 20) { showValidationMessage('comentario'); isValid = false; }
+
+      if (!isValid) return;
+
+      // crear objeto de comentario y persistir
+      const id = 'c_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6);
+      const initials = nombre.split(' ').map(n => n[0] ? n[0] : '').slice(0,2).join('').toUpperCase() || 'U';
+      const commentObj = {
+        id,
+        nombre,
+        initials,
+        rating,
+        comentario,
+        propiedad: propiedad || 'Otro',
+        fecha: 'Hace ahora',
+        author: userToken
+      };
+      const arr = loadComments();
+      arr.push(commentObj);
+      saveComments(arr);
+
+      // renderizar en DOM arriba
+      const card = createCardFromComment(commentObj);
+      grid.insertBefore(card, grid.firstChild);
+
+      alert('¡Gracias por tu reseña! Tu comentario ha sido enviado exitosamente.');
+      form.reset();
+      // reset visual de estrellas en form
+      if (estrellasSelector) {
+        const formStars = estrellasSelector.querySelectorAll('i');
+        formStars.forEach(s => { s.classList.remove('active'); s.style.color = '#ddd'; });
+      }
+      // re-aplicar filtros actuales (si hay)
+      aplicarFiltros();
+    });
+  }
+
+  // validación helpers reutilizables
+  function clearValidationMessage(field) {
+    const message = document.querySelector(`.validation-message[data-field="${field}"]`);
+    if (message) {
+      message.classList.remove('show');
+      const input = document.getElementById(field);
+      if (input) input.classList.remove('input-error');
+    }
+  }
+  function showValidationMessage(field) {
+    const message = document.querySelector(`.validation-message[data-field="${field}"]`);
+    if (message) {
+      message.classList.add('show');
+      const input = document.getElementById(field);
+      if (input) input.classList.add('input-error');
+    }
+  }
+
+  // FILTROS con comportamiento dinamico
+  let filtroActualSentimiento = 'all';
+  let filtroActualCalificacion = 'all';
+
+  function initFiltroSelects() {
+    const selSent = document.getElementById('filtroSentimiento');
+    const selCalif = document.getElementById('filtroCalificacion');
+    if (selSent) {
+      selSent.value = filtroActualSentimiento;
+      selSent.addEventListener('change', function() {
+        filtroActualSentimiento = this.value;
+        aplicarFiltros();
+      });
+    }
+    if (selCalif) {
+      selCalif.value = filtroActualCalificacion;
+      selCalif.addEventListener('change', function() {
+        filtroActualCalificacion = this.value;
+        aplicarFiltros();
+      });
+    }
+  }
+
+  function aplicarFiltros() {
+    const cards = document.querySelectorAll('.resena-card');
+    cards.forEach(card => {
+      const sentimiento = card.dataset.sentimiento;
+      const calificacion = parseInt(card.dataset.calificacion) || 0;
+      const cumpleSentimiento = filtroActualSentimiento === 'all' || sentimiento === filtroActualSentimiento;
+      let cumpleCalificacion;
+      if (filtroActualCalificacion === 'all') cumpleCalificacion = true;
+      else cumpleCalificacion = calificacion === parseInt(filtroActualCalificacion);
+      if (cumpleSentimiento && cumpleCalificacion) card.classList.remove('hidden');
+      else card.classList.add('hidden');
+    });
+    actualizarVisibilidadResenas();
+  }
+
+  // Mostrar solo 4 reseñas por defecto, y alternar con botón
+  let mostrandoTodas = false;
+  function actualizarVisibilidadResenas() {
+    const cards = Array.from(document.querySelectorAll('.resena-card')).filter(card => !card.classList.contains('hidden'));
+    const btn = document.getElementById('toggleResenasBtn');
+    if (cards.length <= 4) {
+      cards.forEach(card => card.style.display = "");
+      if (btn) btn.style.display = "none";
+      return;
+    }
+    if (!mostrandoTodas) {
+      cards.forEach((card, i) => card.style.display = (i < 4 ? "" : "none"));
+      if (btn) {
+        btn.textContent = "Ver todos los comentarios";
+        btn.style.display = "";
+      }
+    } else {
+      cards.forEach(card => card.style.display = "");
+      if (btn) {
+        btn.textContent = "Ver menos";
+        btn.style.display = "";
+      }
+    }
+  }
+
+  // Inicialización del botón
+  function initToggleResenasBtn() {
+    const btn = document.getElementById('toggleResenasBtn');
+    if (!btn) return;
+    btn.addEventListener('click', function() {
+      mostrandoTodas = !mostrandoTodas;
+      actualizarVisibilidadResenas();
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    renderStoredComments();
+    initExistingOwnedCards();
+    initFormBehavior();
+    initFiltroSelects();
+    aplicarFiltros();
+    initToggleResenasBtn();
+    // observar grid para agregar actions en nodos que aparezcan con author=token
+    const grid = document.getElementById('resenasGrid');
+    if (grid) {
+      const observer = new MutationObserver(muts => {
+        muts.forEach(m => {
+          m.addedNodes && m.addedNodes.forEach(n => {
+            if (n.nodeType === 1 && n.classList.contains('resena-card')) {
+              if (n.dataset.author === userToken) addCardActions(n, true);
+            }
+          });
+        });
+      });
+      observer.observe(grid, { childList: true });
+    }
+  });
+})();
+</script>
+
+<!--mauser de la cosa flotante de whatsapp-->
+    <a href="https://wa.me/502XXXXXXXX?text=Hola%20STRUCTURA,%20me%20interesa%20una%20propiedad" class="whatsapp-float" target="_blank" aria-label="Contáctanos por WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+    </a>
+
+<!--mauser del boton flotante S-->
+<a href="index.html" class="boton-flotante" aria-label="Ir a la página principal">
+  <span class="notranslate" translate="no">S</span>
+
+</body>
+</html>

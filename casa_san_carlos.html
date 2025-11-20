@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+
+    <!--mauser de la cosa esa del WhatsApp flotante-->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Propiedad - Structura</title>
+    
+    <link rel="stylesheet" href="style.css">
+    <!-- Replaced/updated local styles to fix form, mapa y layout responsive -->
+    <style>
+      /* inline fixes */
+      :root { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+      html,body{ max-width:100%; overflow-x:hidden; }
+      .navbar{ position:relative; z-index:40; }
+      .theme-toggle{ position:absolute; right:16px; top:12px; z-index:60; background:transparent; border:none; padding:6px; display:inline-flex; align-items:center; gap:8px; cursor:pointer; }
+
+      /* detalle layout */
+      .detalle-gallery img, .gallery-main-image img { max-width:100%; height:auto; display:block; }
+      .detalle-grid{ display:grid; grid-template-columns: 1fr minmax(280px, 360px); gap:28px; align-items:start; }
+      .detalle-main-content, .detalle-sidebar { min-width: 0; box-sizing: border-box; }
+      .detalle-sidebar{ max-width:100%; }
+      .detalle-main-content p{ overflow-wrap: break-word; word-break: break-word; hyphens: auto; line-height:1.6; }
+
+      /* map placeholder */
+      .map-placeholder{ width:100%; box-sizing:border-box; min-height:240px; background:#fafafa; border-radius:8px; padding:14px; }
+
+      /* forms */
+      .form-container{ padding:12px; box-sizing:border-box; width:100%; }
+      .form-group{ margin-bottom:12px; }
+      .form-group input, .form-group textarea, .form-group select { width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid #e6e6e6; }
+      .btn-form{ display:inline-block; }
+
+      /* Google Translate compact styling */
+      .navbar-traductor{ display:flex; align-items:center; gap:8px; font-size:0.95rem; }
+      .goog-te-gadget-simple{ background:transparent !important; padding:0 !important; border:0 !important; }
+      .goog-te-gadget-simple .goog-te-combo { padding:6px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); max-width:160px; font-size:0.95rem; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+
+      /* Images/iframes responsive */
+      iframe { width:100%; max-width:100%; height:auto; display:block; box-sizing: border-box; }
+
+      /* responsive */
+      @media (max-width:768px){
+        .detalle-grid{ grid-template-columns:1fr; gap:18px; }
+        .detalle-sidebar{ width:100%; max-width:100%; }
+        .form-group input, .form-group textarea, .form-group select { width:100%; }
+        .btn-form{ width:100%; }
+        .theme-toggle{ top:10px; right:12px; }
+        .navbar .container{ padding-top:48px; } /* espacio para toggle */
+        iframe{ width:100% !important; max-width:100%; height:320px !important; }
+      }
+    </style>
+</head>
+
+<!--mauser de las miniaturas-->
+<div class="lightbox-overlay" id="lightbox">
+  <button class="lightbox-nav prev">←</button>
+  <img src="" alt="Imagen ampliada" id="lightbox-img">
+  <button class="lightbox-nav next">→</button>
+</div>
+
+<body>
+      <header class="navbar">
+        <div class="container">
+            <a href="index.html" class="navbar-logo-img">
+                <img src="images/STRUCTURA LOGO HORIZONTAL NEGRO@3x.png" alt="Logo Structura">
+            </a>
+
+<!--mauser del selector de idiomas del google -->            
+<div class="navbar-traductor">
+  <label for="google_translate_element" class="traductor-label">🌐 Idioma:</label>
+  <div id="google_translate_element"></div>
+</div>
+
+<!--menu de la cosa esa del navbar-->
+            <nav class="navbar-menu">
+	            <a href="index.html" class="nav-link">Inicio</a>
+	            <a href="propiedades.html" class="nav-link active">Propiedades</a>
+	            <a href="exclusivos.html" class="nav-link">Exclusivos</a>
+	            <a href="nosotros.html" class="nav-link">Nosotros</a>
+	            <a href="resenas.html" class="nav-link">Reseñas</a>
+	            <a href="contacto.html" class="nav-button">Contáctenos</a>
+
+                <!-- Botón deslizante para modo oscuro -->
+                <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar modo oscuro" title="Alternar modo oscuro">
+                    <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+                    <span class="toggle-circle" aria-hidden="true"></span>
+                    <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <section class="detalle-propiedad">
+        <div class="container">
+
+            <div class="detalle-header">
+                <h1>Casa San Carlos</h1>
+                <p class="ubicacion"><i class="fas fa-map-marker-alt"></i> Hacienda del Comendador, Antigua Guatemala</p>
+                <div class="precio">Precio a Consultar</div>
+            </div>
+
+            <div class="detalle-gallery">
+                <div class="gallery-main-image">
+                        <img src="images/sancarlos-1.jpg" alt="Casa San Carlos">
+                </div>
+
+<!--mauser de la miniaturas-->
+<div class="gallery-thumbnails">
+  <img src="miniaturas/casa san carlos/imagen 1.png" data-full="miniaturas/Casa el pilar/imagen 1.jpeg" alt="Miniatura 1" class="miniatura">
+  <img src="miniaturas/casa san carlos/imagen 2.jpg" data-full="miniaturas/Casa el pilar/imagen 2.jpeg" alt="Miniatura 2" class="miniatura">
+  <img src="miniaturas/casa san carlos/imagen 3.png" data-full="miniaturas/Casa el pilar/imagen 3.jpeg" alt="Miniatura 3" class="miniatura">
+  <img src="miniaturas/casa san carlos/imagen 4.PNG" data-full="miniaturas/Casa el pilar/imagen 4.jpeg" alt="Miniatura 4" class="miniatura">
+</div>
+
+<div class="detalle-grid">
+  <!--mauser de la descripcion de la propiedad-->
+  <div class="detalle-main-content">
+    <h3>Descripción</h3>
+    <p>San Carlos es una obra de carácter señorial que rinde homenaje a la arquitectura colonial guatemalteca. Diseñada por Structura, esta residencia combina proporciones clásicas, jardines simétricos y detalles artesanales que evocan la elegancia de las antiguas casonas de Antigua. Cada espacio respira equilibrio y tradición, invitando a disfrutar de la calma y la belleza del entorno.</p>
+    <p>Sus corredores de arcos, patios empedrados y techos de madera tallada dialogan con la luz natural que inunda los interiores. El resultado es una casa donde la historia se funde con la modernidad, ofreciendo un refugio auténtico para quienes buscan sofisticación, calidez y conexión con el pasado.</p>
+
+    <!--cosa esa de las figuritas -->
+    <div class="propiedad-specs">
+      <span><i class="fas fa-bed"></i> 5 habs</span>
+      <span><i class="fas fa-bath"></i> 5.5 baños</span>
+      <span><i class="fas fa-ruler-combined"></i> 480 m²</span>
+      <span><i class="fas fa-car"></i> 3 est.</span>
+    </div>
+
+    <!--amenidades o cosas que trae la casa-->
+    <h3>Amenidades</h3>
+    <ul class="amenidades-lista">
+      <li><i class="fas fa-check"></i> Jardín central con fuente colonial</li>
+      <li><i class="fas fa-check"></i> Corredores con arcadas de medio punto</li>
+      <li><i class="fas fa-check"></i> Sala con chimenea y vigas de madera</li>
+      <li><i class="fas fa-check"></i> Cocina gourmet con acabados de lujo</li>
+      <li><i class="fas fa-check"></i> Terraza con vista a los volcanes</li>
+      <li><i class="fas fa-check"></i> Cuarto de huéspedes independiente</li>
+    </ul>
+
+<!--mapa de google donde esta la ubicacion-->
+    <h3>Mapa de Ubicación</h3>
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d61786.63564335634!2d-90.76981874375126!3d14.561155403227488!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85890e48b70cd259%3A0xbec7585991f7205!2sCondado%20del%20Obispo!5e0!3m2!1ses-419!2sgt!4v1762379262600!5m2!1ses-419!2sgt" style="border:0; width:100%; height:320px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>                                                    
+
+  <!--formulario de persona interesada en la propiedad-->
+  <aside class="detalle-sidebar">
+    <div class="form-container">
+      <h4>Interesado en esta Propiedad</h4>
+      <p>Uno de nuestros asesores le contactará a la brevedad.</p>
+      <form class="form-propiedad">
+        <div class="form-group">
+          <label for="nombre">Nombre Completo</label>
+          <input type="text" id="nombre" name="nombre" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="telefono">Teléfono (Opcional)</label>
+          <input type="tel" id="telefono" name="telefono">
+        </div>
+        <div class="form-group">
+          <label for="mensaje">Mensaje</label>
+          <textarea id="mensaje" name="mensaje" rows="4">Hola, estoy interesado en "Casa San Carlos". Me gustaría recibir más información.</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-form">Solicitar Información</button>
+      </form>
+    </div>
+  </aside>
+</div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <img src="images/STRUCTURA LOGO VERTICAL BLANCO@3x.png" alt="Logo Structura Blanco" class="footer-logo">
+                <p>Diseño y construcción de casas estilo colonial en Antigua Guatemala.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Enlaces Rápidos</h4>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="propiedades.html">Propiedades</a></li>
+                    <li><a href="nosotros.html">Nosotros</a></li>
+                    <li><a href="contacto.html">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contáctenos</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Antigua Guatemala, Sacatepéquez</li>
+                    <li><i class="fas fa-phone"></i> (+502) 7832-9758</li>
+                    <li><i class="fas fa-envelope"></i> informacion@structura.com.gt</li>
+                </ul>
+            </div>
+
+            <!--redes de la emprea-->
+            <div class="footer-col">
+                <h4>Síganos</h4>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Structura. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Añadido: cargar script central que crea el selector de idioma y maneja toggles -->
+    <script src="js/theme.js"></script>
+
+<!--mauser para que funcionen los idiomas-->
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'es',
+      includedLanguages: 'en,zh-CN,hi,es,ar,bn,pt,ru,ja,fr',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    }, 'google_translate_element');
+  }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+
+
+  <!--Detecta si hay idioma guardado en la cookie y lo reaplica -->
+<script>
+  (function () {
+    const match = document.cookie.match(/googtrans=\/[a-zA-Z-]+\/([a-zA-Z-]+)/);
+    if (match) {
+      const lang = match[1];
+      document.cookie = `googtrans=/es/${lang};path=/`;
+    }
+  })();
+</script>
+
+
+<!--scrip de la mauser de la cosa esa de las miniaturas-->
+<script>
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const miniaturas = Array.from(document.querySelectorAll('.miniatura'));
+  const btnPrev = document.querySelector('.lightbox-nav.prev');
+  const btnNext = document.querySelector('.lightbox-nav.next');
+
+  let currentIndex = 0;
+  let zoomed = false;
+  let startX = 0;
+
+  function showImage(index) {
+    currentIndex = index;
+    const img = miniaturas[index];
+    lightboxImg.src = img.src; // Usamos directamente el src porque ya son imágenes grandes
+    lightbox.style.display = 'flex';
+    lightboxImg.style.transform = 'scale(1)';
+    lightboxImg.style.cursor = 'zoom-in';
+    zoomed = false;
+    miniaturas.forEach(img => img.classList.remove('selected'));
+    img.classList.add('selected');
+  }
+
+  miniaturas.forEach((img, i) => {
+    img.addEventListener('click', () => showImage(i));
+  });
+
+  btnPrev.addEventListener('click', () => {
+    currentIndex = (currentIndex - 1 + miniaturas.length) % miniaturas.length;
+    showImage(currentIndex);
+  });
+
+  btnNext.addEventListener('click', () => {
+    currentIndex = (currentIndex + 1) % miniaturas.length;
+    showImage(currentIndex);
+  });
+
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox || e.target === lightboxImg) {
+      lightbox.style.display = 'none';
+      miniaturas.forEach(img => img.classList.remove('selected'));
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (lightbox.style.display === 'flex') {
+      if (e.key === 'Escape') lightbox.style.display = 'none';
+      if (e.key === 'ArrowLeft') btnPrev.click();
+      if (e.key === 'ArrowRight') btnNext.click();
+    }
+  });
+
+  lightboxImg.addEventListener('dblclick', () => {
+    zoomed = !zoomed;
+    lightboxImg.style.transform = zoomed ? 'scale(1.8)' : 'scale(1)';
+    lightboxImg.style.cursor = zoomed ? 'zoom-out' : 'zoom-in';
+  });
+
+  lightboxImg.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    zoomed = !zoomed;
+    lightboxImg.style.transform = zoomed ? 'scale(1.8)' : 'scale(1)';
+    lightboxImg.style.cursor = zoomed ? 'zoom-out' : 'zoom-in';
+  });
+
+  lightbox.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+  });
+
+  lightbox.addEventListener('touchend', (e) => {
+    const endX = e.changedTouches[0].clientX;
+    const deltaX = endX - startX;
+    if (Math.abs(deltaX) > 50) {
+      deltaX > 0 ? btnPrev.click() : btnNext.click();
+    }
+  });
+</script>
+
+<!--mauser de la cosa esa del boton flotante de WhatsApp-->
+<a href="https://wa.me/502XXXXXXXX?text=Hola%20STRUCTURA,%20me%20interesa%20una%20propiedad" 
+   class="whatsapp-float" target="_blank" aria-label="Contáctanos por WhatsApp">
+  <i class="fab fa-whatsapp"></i>
+</a> 
+
+<!--mauser del boton flotante S-->
+<a href="index.html" class="boton-flotante" aria-label="Ir a la página principal">
+  <span class="notranslate" translate="no">S</span>
+
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+  <!--mauser de la cosa esa del WhatsApp flotante-->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Propiedad - Structura</title>
+    
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+      /* inline fixes */
+      html,body{ max-width:100%; overflow-x:hidden; }
+      .navbar{ position:relative; }
+      .theme-toggle{ position:absolute; right:16px; top:12px; }
+
+      /* Evitar que la columna lateral fuerce overflow: usar minmax y permitir encoger (min-width:0 en hijos) */
+      .detalle-grid{
+        display:grid;
+        grid-template-columns: 1fr minmax(280px, 360px);
+        gap:28px;
+        align-items:start;
+      }
+
+      /* Permitir que las columnas del grid se reduzcan sin forzar overflow */
+      .detalle-main-content,
+      .detalle-sidebar { min-width: 0; box-sizing: border-box; }
+
+      /* Imágenes/iframes responsivos */
+      .gallery-main-image img,
+      iframe { width:100%; max-width:100%; height:auto; display:block; box-sizing: border-box; }
+
+      /* Forzar quiebre de palabras y evitar que largos fragmentos rompan el contenedor */
+      .detalle-main-content p {
+        overflow-wrap: break-word;
+        word-break: break-word;
+        hyphens: auto;
+      }
+
+      /* Sidebar / formulario: asegurar ancho dentro de su columna */
+      .detalle-sidebar { max-width: 100%; }
+      .form-container { box-sizing: border-box; width:100%; }
+
+      .form-group input,
+      .form-group textarea { width:100%; box-sizing: border-box; }
+
+      @media (max-width:768px){
+        .detalle-grid{ grid-template-columns:1fr; gap:18px; }
+        iframe{ height:320px; }
+        .btn-form{ width:100%; }
+        .navbar .container{ padding-top:48px; } /* espacio para toggle */
+      }
+
+    </style>
+
+</head>
+
+<!--mauser de las miniaturas-->
+<div class="lightbox-overlay" id="lightbox">
+  <button class="lightbox-nav prev">←</button>
+  <img src="" alt="Imagen ampliada" id="lightbox-img">
+  <button class="lightbox-nav next">→</button>
+</div>
+
+<body>
+<!--mauser del logo-->
+    <header class="navbar">
+        <div class="container">
+            <a href="index.html" class="navbar-logo-img">
+                <img src="images/STRUCTURA LOGO HORIZONTAL NEGRO@3x.png" alt="Logo Structura">
+            </a>
+
+<!--mauser de las traducciones del traductor-->            
+            <div class="navbar-traductor">
+              <label for="google_translate_element" class="traductor-label">🌐 Idioma:</label>
+              <div id="google_translate_element"></div>
+            </div>
+
+            <nav class="navbar-menu">
+	            <a href="index.html" class="nav-link">Inicio</a>
+	            <a href="propiedades.html" class="nav-link active">Propiedades</a>
+	            <a href="exclusivos.html" class="nav-link">Exclusivos</a>
+	            <a href="nosotros.html" class="nav-link">Nosotros</a>
+	            <a href="resenas.html" class="nav-link">Reseñas</a>
+	            <a href="contacto.html" class="nav-button">Contáctenos</a>
+
+                <!-- Boton de la cosa esa deslizante para modo oscuro -->
+                <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar modo oscuro" title="Alternar modo oscuro">
+                    <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+                    <span class="toggle-circle" aria-hidden="true"></span>
+                    <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <section class="detalle-propiedad">
+        <div class="container">
+
+            <div class="detalle-header">
+                <h1>Casa Sikaffi</h1>
+                <p class="ubicacion"><i class="fas fa-map-marker-alt"></i> Hacienda del Comendador, Antigua Guatemala</p>
+                <div class="precio">Precio a Consultar</div>
+            </div>
+
+            <div class="detalle-gallery">
+                <div class="gallery-main-image">
+                    <img src="images/skaffi.JPG" alt="Vista principal de Residencia El Cafetal">
+                </div>
+
+                <!--mauser de las miniaturas y sus imagenes-->
+                <div class="gallery-thumbnails">
+                  <img src="miniaturas/sikaffi/GOPR0307.JPG" data-full="miniaturas/Casa el pilar/imagen 1.jpeg" alt="Miniatura 1" class="miniatura">
+                  <img src="miniaturas/sikaffi/IMG_3257.JPG" data-full="miniaturas/Casa el pilar/imagen 2.jpeg" alt="Miniatura 2" class="miniatura">
+                  <img src="miniaturas/sikaffi/IMG_3267.JPG" data-full="miniaturas/Casa el pilar/imagen 3.jpeg" alt="Miniatura 3" class="miniatura">
+                  <img src="miniaturas/sikaffi/IMG_3303.JPG" data-full="miniaturas/Casa el pilar/imagen 4.jpeg" alt="Miniatura 4" class="miniatura">
+                </div>
+
+                <div class="detalle-grid">
+                    <div class="detalle-main-content">
+                        <h3>Descripción</h3>
+                        <p>Sumérjase en el lujo colonial con esta magnífica residencia. Diseñada por Structura, "Casa El Pilar" captura la esencia de Antigua con sus pasillos de terraza española, búcaros de agua y vistas impresionantes a los volcanes.</p>
+                        <p>Cada detalle ha sido meticulosamente seleccionado, desde los pisos de barro hechos a mano hasta las cúpulas artesanales y la madera de conacaste en puertas y vigas. La propiedad cuenta con un jardín central que sirve como el corazón del hogar, ideal para el entretenimiento y la vida familiar.</p>
+
+                        <!--cosa esa de las figuritas -->
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 4 habs</span> <!--bed = cama-->
+                            <span><i class="fas fa-bath"></i> 4.5 baños</span> <!--bath = baño-->
+                            <span><i class="fas fa-ruler-combined"></i> 450 m²</span> <!--ruler-combined = regla o medidas-->
+                            <span><i class="fas fa-car"></i> 2 est.</span> <!--car = coche de pocoyo -->
+                        </div>
+
+                        <!--amenidades o cosas que trae la casa-->
+                        <h3>Amenidades</h3>
+                        <ul class="amenidades-lista">
+                            <li><i class="fas fa-check"></i> Jardín Central con Búcaro</li>
+                            <li><i class="fas fa-check"></i> Piscina Climatizada</li>
+                            <li><i class="fas fa-check"></i> Terraza Española con Pérgola</li>
+                            <li><i class="fas fa-check"></i> Vistas al Volcán de Agua</li>
+                            <li><i class="fas fa-check"></i> Acabados de Lujo</li>
+                            <li><i class="fas fa-check"></i> Cuarto de Servicio</li>
+                        </ul>
+
+                        <!--mapa de google donde esta la ubicacion-->
+                        <h3>Mapa de Ubicación</h3>
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d61786.63564335634!2d-90.76981874375126!3d14.561155403227488!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85890e48b70cd259%3A0xbec7585991f7205!2sCondado%20del%20Obispo!5e0!3m2!1ses-419!2sgt!4v1762379262600!5m2!1ses-419!2sgt" style="border:0; width:100%; height:320px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+
+                    <!--formulario de persona interesada en la propiedad-->
+                    <aside class="detalle-sidebar">
+                        <div class="form-container">
+                            <h4>Interesado en esta Propiedad</h4>
+                            <p>Uno de nuestros asesores le contactará a la brevedad.</p>
+                            <form class="form-propiedad">
+                                <div class="form-group">
+                                    <label for="nombre">Nombre Completo</label>
+                                    <input type="text" id="nombre" name="nombre" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" id="email" name="email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="telefono">Teléfono (Opcional)</label>
+                                    <input type="tel" id="telefono" name="telefono">
+                                </div>
+                                <div class="form-group">
+                                    <label for="mensaje">Mensaje</label>
+                                    <textarea id="mensaje" name="mensaje" rows="4">Hola, estoy interesado en "Casa Sikaffi". Me gustaría recibir más información.</textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-form">Solicitar Información</button>
+                            </form>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!--parte inferior de la pagina-->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <img src="images/STRUCTURA LOGO VERTICAL BLANCO@3x.png" alt="Logo Structura Blanco" class="footer-logo">
+                <p>Diseño y construcción de casas estilo colonial en Antigua Guatemala.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Enlaces Rápidos</h4>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="propiedades.html">Propiedades</a></li>
+                    <li><a href="nosotros.html">Nosotros</a></li>
+                    <li><a href="contacto.html">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contáctenos</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Antigua Guatemala, Sacatepéquez</li>
+                    <li><i class="fas fa-phone"></i> (+502) 7832-9758</li>
+                    <li><i class="fas fa-envelope"></i> informacion@structura.com.gt</li>
+                </ul>
+            </div>
+            <!--redes de la empresa-->
+            <div class="footer-col">
+                <h4>Síganos</h4>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Structura. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Añadido: cargar script central que crea el selector de idioma y maneja toggles -->
+    <script src="js/theme.js"></script>
+
+<!--mauser para que funcionen los idiomas-->
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'es',
+      includedLanguages: 'en,zh-CN,hi,es,ar,bn,pt,ru,ja,fr',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    }, 'google_translate_element');
+  }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <!-- Lightbox -->
+    <script>
+      const lightbox=document.getElementById('lightbox');
+      const lightboxImg=document.getElementById('lightbox-img');
+      const miniaturas=Array.from(document.querySelectorAll('.miniatura'));
+      const btnPrev=document.querySelector('.lightbox-nav.prev');
+      const btnNext=document.querySelector('.lightbox-nav.next');
+      let currentIndex=0;
+      function showImage(index){
+        currentIndex=index;
+        const img=miniaturas[index];
+        lightboxImg.src=img.src;
+        lightbox.style.display='flex';
+        miniaturas.forEach(img=>img.classList.remove('selected'));
+        img.classList.add('selected');
+      }
+      miniaturas.forEach((img,i)=>img.addEventListener('click',()=>showImage(i)));
+      btnPrev.addEventListener('click',()=>{currentIndex=(currentIndex-1+miniaturas.length)%miniaturas.length;showImage(currentIndex);});
+      btnNext.addEventListener('click',()=>{currentIndex=(currentIndex+1)%miniaturas.length;showImage(currentIndex);});
+      lightbox.addEventListener('click',e=>{if(e.target===lightbox||e.target===lightboxImg){lightbox.style.display='none';miniaturas.forEach(img=>img.classList.remove('selected'));}});
+    </script>
+
+<!--mauser de la cosa flotante de whatsapp-->
+    <a href="https://wa.me/502XXXXXXXX?text=Hola%20STRUCTURA,%20me%20interesa%20una%20propiedad" class="whatsapp-float" target="_blank" aria-label="Contáctanos por WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+    </a>
+
+<!--mauser del boton flotante S-->
+<a href="index.html" class="boton-flotante" aria-label="Ir a la página principal">
+  <span class="notranslate" translate="no">S</span>
+
+</body>
+</html>

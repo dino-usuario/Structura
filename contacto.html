@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-C">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto - Structura</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+      /* CORRECCIÓN: Asegurar navbar responsivo sin deslizamiento */
+      .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background-color: var(--color-blanco);
+        padding: 1rem 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      @media (max-width: 768px) {
+        .navbar .container {
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
+        .navbar-logo-img {
+          flex: 1;
+          min-width: 150px;
+        }
+
+        .navbar-traductor {
+          width: auto;
+          margin-top: 0;
+        }
+
+        .navbar-menu {
+          width: 100%;
+          flex-direction: column;
+          align-items: stretch;
+          padding-top: 0.5rem;
+          border-top: 1px solid #eee;
+          margin-top: 0.5rem;
+        }
+      }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="container">
+            <a href="index.html" class="navbar-logo-img">
+                <img src="images/STRUCTURA LOGO HORIZONTAL NEGRO@3x.png" alt="Logo Structura">
+            </a>
+
+<!--mauser del selector de idiomas de google -->          
+<div class="navbar-traductor">
+  <label for="google_translate_element" class="traductor-label">🌐 Idioma:</label>
+  <div id="google_translate_element"></div>
+</div>
+
+<!--mauser del menu del navar ese-->
+            <nav class="navbar-menu">
+                <a href="index.html" class="nav-link">Inicio</a>
+                <a href="propiedades.html" class="nav-link">Propiedades</a>
+                <a href="exclusivos.html" class="nav-link">Exclusivos</a>
+                <a href="nosotros.html" class="nav-link">Nosotros</a>
+                <a href="resenas.html" class="nav-link">Reseñas</a>
+                <a href="contacto.html" class="nav-button">Contáctenos</a>
+
+                <!-- Botón deslizante para modo oscuro -->
+                <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar modo oscuro" title="Alternar modo oscuro">
+                    <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+                    <span class="toggle-circle" aria-hidden="true"></span>
+                    <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>Póngase en Contacto</h1>
+            <p>Estamos listos para atender sus consultas y agendar una visita.</p>
+        </div>
+    </section>
+
+    <section class="contact-page-section">
+        <div class="container contact-grid">
+            
+            <div class="contact-info">
+                <h3>Información de Contacto</h3>
+                <p>Pase a visitarnos a nuestras oficinas en Antigua Guatemala para una consulta personalizada sobre su próximo proyecto o inversión.</p>
+                
+                <ul class="contact-details">
+                    <li>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Antigua Guatemala, Sacatepéquez</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-phone"></i>
+                        <span>(+502) 7832-9758</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-envelope"></i>
+                        <span>informacion@structura.com.gt</span>
+                    </li>
+                </ul>
+
+                <!--ubicacion segun el google maps -->
+                <h3>Nuestra Ubicación</h3>
+                  <iframe 
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3861.6760060933316!2d-90.72813955975539!3d14.560511178114048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85890e776ee97f61%3A0x5a8052fe2c4c73fb!2sStructura!5e0!3m2!1ses-419!2sgt!4v1762375320880!5m2!1ses-419!2sgt"
+                   width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" 
+                   referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+
+            <!--formulario de persona que se quiere poner en contacto-->
+            <div class="contact-form-container">
+                <h3>Envíenos un Mensaje</h3>
+                <form class="contact-form">
+                    <div class="form-group">
+                        <label for="contact-nombre">Nombre Completo</label>
+                        <input type="text" id="contact-nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-email">Email</label>
+                        <input type="email" id="contact-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-asunto">Asunto</label>
+                        <input type="text" id="contact-asunto" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-mensaje">Mensaje</label>
+                        <textarea id="contact-mensaje" rows="6" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-form">Enviar Mensaje</button>
+                </form>
+            </div>
+
+            <!--parte inferior de la pagina-->
+        </div> </section> <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <img src="images/STRUCTURA LOGO VERTICAL BLANCO@3x.png" alt="Logo Structura Blanco" class="footer-logo">
+                <p>Diseño y construcción de casas estilo colonial en Antigua Guatemala.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Enlaces Rápidos</h4>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="propiedades.html">Propiedades</a></li>
+                    <li><a href="exclusivos.html">Exclusivos</a></li>
+                    <li><a href="nosotros.html">Nosotros</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contáctenos</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Antigua Guatemala, Sacatepéquez</li>
+                    <li><i class="fas fa-phone"></i> (+502) 7832-9758</li>
+                    <li><i class="fas fa-envelope"></i> informacion@structura.com.gt</li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Síganos</h4>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 Structura. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="js/theme.js"></script>
+
+<!--mauser para que funcionen los idiomas-->
+    <script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'es',
+      includedLanguages: 'en,zh-CN,hi,es,ar,bn,pt,ru,ja,fr',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    }, 'google_translate_element');
+  }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+  <!--Detecta si hay idioma guardado en la cookie y lo reaplica -->
+<script>
+  (function () {
+    const match = document.cookie.match(/googtrans=\/[a-zA-Z-]+\/([a-zA-Z-]+)/);
+    if (match) {
+      const lang = match[1];
+      document.cookie = `googtrans=/es/${lang};path=/`;
+    }
+  })();
+</script>
+
+<!--mauser de la cosa esa del boton flotante de WhatsApp-->
+<a href="https://wa.me/502XXXXXXXX?text=Hola%20STRUCTURA,%20me%20interesa%20una%20propiedad" 
+   class="whatsapp-float" target="_blank" aria-label="Contáctanos por WhatsApp">
+  <i class="fab fa-whatsapp"></i>
+</a> 
+
+<!--mauser del boton flotante S-->
+<a href="index.html" class="boton-flotante" aria-label="Ir a la página principal">
+  <span class="notranslate" translate="no">S</span>
+
+</body>
+</html>

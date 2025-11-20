@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Structura - Arquitectura y Construcción en Antigua Guatemala</title>
+    
+    <!-- Init rápido del tema para evitar FOUC y aplicar estado guardado -->
+	<script>
+		(function(){
+			try {
+				var saved = localStorage.getItem('theme');
+				if (saved === 'dark') document.documentElement.setAttribute('data-theme','dark');
+				else if (!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+					document.documentElement.setAttribute('data-theme','dark');
+				}
+			} catch(e) { /* no-op si no existe localStorage */ } 
+		})();
+	</script>
+    <link rel="stylesheet" href="style.css">
+    <!-- small overrides to ensure toggle/translate correct even if cached CSS -->
+    <style>
+      html,body{ max-width:100%; overflow-x:hidden; }
+      .navbar{ position:relative; }
+      .theme-toggle{ position:absolute; right:16px; top:12px; z-index:60; background:transparent; border:none; padding:6px; display:inline-flex; align-items:center; gap:8px; cursor:pointer; }
+
+      .navbar-traductor{ display:flex; align-items:center; gap:8px; font-size:0.95rem; }
+      .goog-te-gadget-simple .goog-te-combo { padding:6px 10px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); max-width:160px; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+
+      @media (max-width:768px){
+        .navbar .container{ padding-top:48px; }
+        .theme-toggle{ top:10px; right:12px; }
+        .btn{ width:100%; }
+      }
+
+      /* --- NUEVOS ESTILOS: carrusel de propiedades (mejorado) --- */
+      :root{
+        --carousel-gap: 26px;
+        --card-width: 320px;
+        --card-scale: 1.12; /* mayor énfasis en la tarjeta central */
+        --card-ease: cubic-bezier(.22,.9,.3,1);
+        --muted-blur: 4px;
+        --muted-opacity: 0.58;
+      }
+
+      .propiedades-carousel{ position:relative; overflow:visible; padding:20px 0 56px; }
+      /* permite swipe horizontal mientras permite scroll vertical en la página */
+      .propiedades-carousel .carousel-viewport{ overflow:hidden; outline: none; touch-action: pan-y; -ms-touch-action: pan-y; }
+
+      .carousel-track{
+        display:flex;
+        gap:var(--carousel-gap);
+        align-items:center; /* centra verticalmente las cards */
+        transition:transform 520ms var(--card-ease);
+        will-change:transform;
+        padding:12px 6px;
+        perspective:1200px;
+      }
+
+      /* tarjeta */
+      .propiedad-card{
+        flex: 0 0 var(--card-width);
+        max-width: var(--card-width);
+        border-radius:12px;
+        overflow:hidden;
+        background:transparent;
+        transition: transform 360ms var(--card-ease), box-shadow 360ms var(--card-ease), filter 360ms var(--card-ease), opacity 360ms var(--card-ease);
+        transform-origin:center center;
+        backface-visibility:hidden;
+      }
+
+      /* IMAGEN: forzar recorte y cover */
+      .propiedad-imagen{
+        width:100%;
+        height:220px;
+        overflow:hidden;
+        position:relative;
+        background:#eee;
+      }
+      .propiedad-imagen img{
+        width:100%;
+        height:100%;
+        object-fit:cover;
+        display:block;
+        transition: transform 520ms var(--card-ease);
+      }
+
+      /* difuminado y atenuado para tarjetas laterales */
+      .propiedad-card:not(.is-active){
+        filter: blur(var(--muted-blur)) grayscale(.28) contrast(.92);
+        opacity: var(--muted-opacity);
+        transform: translateY(8px) scale(.98) rotateY(-3deg);
+        pointer-events: auto;
+      }
+
+      /* tarjeta central destacada */
+      .propiedad-card.is-active{
+        transform: translateY(0) scale(var(--card-scale)) rotateY(0deg);
+        z-index:4;
+        opacity:1;
+        filter: none;
+        box-shadow: 0 28px 60px rgba(18,18,18,0.16);
+      }
+
+      /* levanta ligeramente la imagen de la tarjeta activa para mayor dinamismo */
+      .propiedad-card.is-active .propiedad-imagen img{
+        transform: scale(1.06);
+      }
+
+      /* overlay sutil en la base de cada card para mejorar lectura del texto */
+      .propiedad-card .propiedad-info{
+        position:relative;
+        background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.03) 60%, rgba(0,0,0,0.04) 100%);
+        padding:18px;
+        border-top:1px solid rgba(0,0,0,0.03);
+      }
+
+      /* botones */
+      .carousel-nav{
+        position:absolute;
+        top:50%;
+        transform:translateY(-50%);
+        width:44px; height:44px;
+        border-radius:50%;
+        background:#fff; border:1px solid rgba(0,0,0,0.06);
+        display:flex; align-items:center; justify-content:center;
+        cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,0.06);
+      }
+      .carousel-prev{ left:8px; }
+      .carousel-next{ right:8px; }
+      .carousel-nav i{ color: #ff6b19; }
+
+      /* dots */
+      .carousel-dots{ display:flex; gap:8px; justify-content:center; margin-top:18px; }
+      .carousel-dot{ width:10px; height:10px; border-radius:50%; background:rgba(0,0,0,0.12); cursor:pointer; border:none; transition: transform 220ms, background 220ms; }
+      .carousel-dot.is-active{ background:#ff6b19; transform:scale(1.12); box-shadow:0 6px 12px rgba(255,107,25,0.12); }
+
+      /* responsive: en pantallas pequeñas mostrar 1 card ancho (scroll snap-like) */
+      @media (max-width:900px){
+        :root{ --card-width: calc(100% - 64px); --carousel-gap:18px; --card-scale:1.04; --muted-blur:2px; --muted-opacity:0.78; }
+        .carousel-nav{ display:none; }
+        .propiedades-carousel .carousel-viewport{ padding:6px 0; }
+        .propiedad-imagen{ height:200px; }
+      }
+
+      /* pequeño ajuste visual para que las cards laterales no sobresalgan con bordes */
+      .propiedad-card,
+      .propiedad-card * { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+
+      /* Override cuando se desactiva el difuminado */
+      .propiedades-carousel.no-blur .propiedad-card:not(.is-active){
+        filter: none !important;
+        opacity: 0.92 !important;
+        transform: translateY(4px) scale(0.995) rotateY(-1deg) !important;
+      }
+
+      /* Control visual para activar/desactivar difuminado */
+      .carousel-controls{ display:flex; justify-content:flex-end; margin-top:12px; margin-bottom:6px; align-items:center; gap:12px; }
+      .switch{ display:inline-flex; align-items:center; gap:10px; cursor:pointer; user-select:none; }
+      .switch input{ display:none; }
+      .switch .slider{ width:44px; height:24px; background:rgba(0,0,0,0.12); border-radius:999px; position:relative; transition:background .22s; }
+      .switch .slider::after{ content:""; position:absolute; width:18px; height:18px; top:3px; left:3px; background:#fff; border-radius:50%; box-shadow:0 2px 6px rgba(0,0,0,0.12); transition:transform .22s; }
+      .switch input:checked + .slider{ background:#ff6b19; }
+      .switch input:checked + .slider::after{ transform:translateX(20px); }
+      .switch .switch-label{ font-size:0.95rem; color:var(--text-color, #222); }
+    </style>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            
+            <a href="index.html" class="navbar-logo-img">
+                <img src="images/STRUCTURA LOGO HORIZONTAL NEGRO@3x.png" alt="Logo Structura">
+            </a>
+
+<!--mauser del selector de idomas del google -->
+<div class="navbar-traductor">
+  <label for="google_translate_element" class="traductor-label">🌐 Idioma:</label>
+  <div id="google_translate_element"></div>
+</div>
+
+<!--parte del munu naranjita del navbar-->
+            <nav class="navbar-menu">
+                <a href="index.html" class="nav-link active">Inicio</a>
+                <a href="propiedades.html" class="nav-link">Propiedades</a>
+                <a href="exclusivos.html" class="nav-link">Exclusivos</a>
+                <a href="nosotros.html" class="nav-link">Nosotros</a>
+                <a href="resenas.html" class="nav-link">Reseñas</a>
+                <a href="contacto.html" class="nav-button">Contáctenos</a>
+
+                <!-- Botón deslizante para modo oscuro junto a los iconos  -->
+                <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar modo oscuro" title="Alternar modo oscuro">
+                    <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+                    <span class="toggle-circle" aria-hidden="true"></span>
+                    <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
+                </button>
+            </nav>
+        </div>
+
+    </header>
+<!--parte del video del encabezado de la pagina principal -->
+    <section class="hero">
+        
+        <video autoplay muted loop playsinline class="hero-video">
+            <source src="videos/0001-INTRO.mp4" type="video/mp4">
+            <source src="videos/0001-INTRO.webm" type="video/webm">
+            Tu navegador no soporta videos.
+        </video>
+
+        <div class="hero-overlay"></div> 
+        <div class="container hero-content">
+            <h1>Structura: Vivencia Antigüeña</h1>
+            <p>Arquitectura que Trasciende. Diseño magistral y construcción impecable.</p>
+            <div class="hero-buttons">
+                <a href="propiedades.html" class="btn btn-primary">Ver Propiedades</a> 
+                <a href="exclusivos.html" class="btn btn-secondary">Ver Exclusivos</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="intro">
+        <div class="container intro-container">
+            <div class="intro-texto">
+                <span class="subtitulo-naranja">NUESTRA FILOSOFÍA</span>
+                <h2>Construyendo Sueños en el Corazón Colonial</h2>
+                <p>Acompañamos a inversionistas y familias a materializar sus sueños, transformando lotes en hogares excepcionales. En Structura, no solo construimos casas; creamos legados arquitectónicos en Antigua Guatemala.</p>
+                <p>Nuestra pasión es fusionar el diseño colonial tradicional con las comodidades modernas, creando espacios que son a la vez atemporales y funcionales.</p>
+                <a href="nosotros.html" class="btn btn-secondary-dark">Conozca más sobre nosotros</a>
+            </div>
+            <div class="intro-imagen">
+                <img src="images/DSC_0321.jpg" alt="Detalle arquitectónico colonial">
+            </div>
+        </div>
+    </section>
+    
+    <section class="propiedades" id="propiedades">
+        <div class="container">
+            <div class="titulo-seccion">
+                <span class="subtitulo-naranja">PROYECTOS EXCLUSIVOS</span>
+                <h2>Propiedades Destacadas</h2>
+            </div>
+
+<!-- AGREGADO: control para activar/desactivar difuminado -->
+            <div class="carousel-controls" aria-hidden="false">
+              <label class="switch" title="Activar o desactivar difuminado">
+                <input type="checkbox" id="blurToggle" checked>
+                <span class="slider" aria-hidden="true"></span>
+                <span class="switch-label">Difuminado</span>
+              </label>
+            </div>
+
+<!-- inicio: reemplazo de la cuadrícula por carrusel -->
+            <div class="propiedades-carousel" aria-label="Carrusel de propiedades">
+              <div class="carousel-viewport">
+                <div class="carousel-track" id="carouselTrack">
+                  <!-- tarjeta 1 -->
+                  <div class="propiedad-card" role="group" aria-roledescription="slide">
+                    <div class="propiedad-imagen">
+                        <img src="images/elpilar-1.JPG" alt="Casa El Pilar">
+                        <span class="propiedad-estado">Entregada</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa El Pilar</h3>
+                        <p class="propiedad-ubicacion">Hacienda del Comendador</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 4 habs</span>
+                            <span><i class="fas fa-bath"></i> 4.5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 450 m²</span>
+                        </div>
+                        <a href="Casa el PIlar.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                  </div>
+
+                  <!-- tarjeta 2 -->
+                  <div class="propiedad-card" role="group" aria-roledescription="slide">
+                    <div class="propiedad-imagen">
+                        <img src="images/entreruinas-1.jpg" alt="Casa Entre Ruinas">
+                        <span class="propiedad-estado">Entregada</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa Entre Ruinas</h3>
+                        <p class="propiedad-ubicacion">Condado del Obispo</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 3 habs</span>
+                            <span><i class="fas fa-bath"></i> 3 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 380 m²</span>
+                        </div>
+                        <a href="Casa entre ruinas.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                  </div>
+
+                  <!-- tarjeta 3 -->
+                  <div class="propiedad-card" role="group" aria-roledescription="slide">
+                    <div class="propiedad-imagen">
+                        <img src="images/sancarlos-1.jpg" alt="Casa San Carlos">
+                        <span class="propiedad-estado">Entregada</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa San Carlos</h3>
+                        <p class="propiedad-ubicacion">San Juan del Obispo</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa_san_carlos.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                  </div>
+
+                </div> <!-- .carousel-track -->
+              </div> <!-- .carousel-viewport -->
+
+              <button class="carousel-nav carousel-prev" id="carouselPrev" aria-label="Anterior">
+                <i class="fas fa-chevron-left" aria-hidden="true"></i>
+              </button>
+              <button class="carousel-nav carousel-next" id="carouselNext" aria-label="Siguiente">
+                <i class="fas fa-chevron-right" aria-hidden="true"></i>
+              </button>
+
+              <div class="carousel-dots" id="carouselDots" role="tablist" aria-label="Paginación del carrusel"></div>
+            </div>
+<!-- fin: carrusel -->
+
+        </div>
+    </section>
+
+    <!--seccion de beneficios-->
+    <section class="beneficios">
+        <div class="container">
+            <div class="titulo-seccion-light">
+                <span class="subtitulo-blanco">LA EXPERIENCIA STRUCTURA</span>
+                <h2>¿Por Qué Invertir con Nosotros?</h2>
+            </div>
+
+            <div class="beneficios-grid">
+                
+                <div class="beneficio-card">
+                    <div class="beneficio-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h4>Excelencia en Diseño Colonial</h4>
+                    <p>Preservamos la esencia de Antigua con acabados artesanales y un toque de modernidad funcional.</p>
+                </div>
+
+                <div class="beneficio-card">
+                    <div class="beneficio-icon">
+                        <i class="fas fa-hammer"></i>
+                    </div>
+                    <h4>Calidad de Construcción</h4>
+                    <p>Utilizamos solo materiales premium y supervisión experta para garantizar un hogar que perdura generaciones.</p>
+                </div>
+
+                <div class="beneficio-card">
+                    <div class="beneficio-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h4>Ubicaciones Privilegiadas</h4>
+                    <p>Invierta en los entornos más deseados y exclusivos de Antigua Guatemala, con alta plusvalía.</p>
+                </div>
+
+                <div class="beneficio-card">
+                    <div class="beneficio-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h4>Atención Personalizada</h4>
+                    <p>Le acompañamos en cada paso del proceso, desde el diseño inicial hasta la entrega de llaves.</p>
+                </div>
+
+                <!--redireccionamiento para contacto-->
+            </div> </div> </section> <section class="cta">
+        <div class="container">
+            <h2>¿Listo para Construir su Futuro en Antigua?</h2>
+            <p>Contáctenos hoy mismo para agendar una consulta y descubrir las oportunidades exclusivas que Structura tiene para usted.</p>
+            <a href="contacto.html" class="btn btn-primary cta-button">Agendar una Consulta</a>
+        </div>
+    </section>
+
+    <!--parte inferior de la pagina-->
+    <footer class="footer">
+        <div class="container footer-grid">
+            
+            <div class="footer-col">
+                <img src="images/STRUCTURA LOGO VERTICAL BLANCO@3x.png" alt="Logo Structura Blanco" class="footer-logo">
+                <p>Diseño y construcción de casas estilo colonial en Antigua Guatemala. Creamos legados arquitectónicos.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>Enlaces Rápidos</h4>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="propiedades.html">Propiedades</a></li>
+                    <li><a href="exclusivos.html">Exclusivos</a></li>
+                    <li><a href="nosotros.html">Nosotros</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Contáctenos</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Antigua Guatemala, Sacatepéquez</li>
+                    <li><i class="fas fa-phone"></i> (+502) 7832-9758</li>
+                    <li><i class="fas fa-envelope"></i> informacion@structura.com.gt</li>
+                </ul>
+            </div>
+
+            <!--redes de la empresa-->
+            <div class="footer-col">
+                <h4>Síganos</h4>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Structura. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Script externo (filtrado + theme-toggle centralizado) -->
+    <script src="js/theme.js"></script>
+
+<!-- REEMPLAZADO: script inline completo para controlar el carrusel (soporte pointer/touch) -->
+<script>
+(function(){
+  const track = document.getElementById('carouselTrack');
+  if (!track) return;
+  const cards = Array.from(track.children);
+  const prev = document.getElementById('carouselPrev');
+  const next = document.getElementById('carouselNext');
+  const dotsWrap = document.getElementById('carouselDots');
+  const viewport = track.parentElement; // .carousel-viewport
+  let index = 0;
+
+  // hacer viewport focusable para teclado
+  if (viewport && !viewport.hasAttribute('tabindex')) viewport.tabIndex = 0;
+
+  // crear dots
+  cards.forEach((c, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'carousel-dot';
+    dot.type = 'button';
+    dot.setAttribute('aria-label', 'Ir a la diapositiva ' + (i+1));
+    dot.addEventListener('click', () => goTo(i));
+    dotsWrap.appendChild(dot);
+  });
+  const dots = Array.from(dotsWrap.children);
+
+  // estado de transform (px)
+  let baseTranslate = 0;
+
+  function update(){
+    const gap = parseFloat(getComputedStyle(track).gap) || 26;
+    const cardWidth = cards[0].getBoundingClientRect().width;
+    const viewportW = viewport.getBoundingClientRect().width;
+    const targetX = (cardWidth + gap) * index - (viewportW - cardWidth) / 2;
+    baseTranslate = -Math.max(0, targetX);
+    track.style.transition = 'transform 520ms cubic-bezier(.22,.9,.3,1)';
+    track.style.transform = 'translateX(' + baseTranslate + 'px)';
+    cards.forEach((c, i) => c.classList.toggle('is-active', i === index));
+    dots.forEach((d, i) => d.classList.toggle('is-active', i === index));
+  }
+
+  function goTo(i){
+    index = Math.max(0, Math.min(cards.length - 1, i));
+    update();
+  }
+
+  prev && prev.addEventListener('click', () => goTo(index - 1));
+  next && next.addEventListener('click', () => goTo(index + 1));
+
+  // teclado
+  viewport.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') goTo(index - 1);
+    if (e.key === 'ArrowRight') goTo(index + 1);
+  });
+
+  // resize debounce
+  let t;
+  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(update, 120); });
+
+  // start centered on the middle card (si hay 3+)
+  index = Math.floor((cards.length - 1) / 2);
+
+  // asegurar imágenes cargadas antes de primer update
+  const imgs = track.querySelectorAll('img');
+  let loaded = 0;
+  if (imgs.length === 0) { update(); }
+  imgs.forEach(img => {
+    if (img.complete) { loaded++; }
+    else img.addEventListener('load', () => { loaded++; if (loaded === imgs.length) update(); });
+  });
+  if (loaded === imgs.length) update();
+
+  /* ---------- TOUCH / POINTER SWIPE ---------- */
+  let pointerDown = false;
+  let startX = 0;
+  let currentTranslate = 0;
+  let lastMoveX = 0;
+  const SWIPE_THRESHOLD = 50; // px mínimo para considerar swipe
+
+  function onPointerDown(e){
+    // aceptar mouse left or touch/pointer
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    pointerDown = true;
+    startX = e.clientX;
+    lastMoveX = startX;
+    track.style.transition = 'none';
+    currentTranslate = baseTranslate;
+    try { e.target.setPointerCapture && e.target.setPointerCapture(e.pointerId); } catch(err){}
+  }
+
+  function onPointerMove(e){
+    if (!pointerDown) return;
+    const dx = e.clientX - startX;
+    lastMoveX = e.clientX;
+    track.style.transform = 'translateX(' + (currentTranslate + dx) + 'px)';
+  }
+
+  function endDrag(e){
+    if (!pointerDown) return;
+    pointerDown = false;
+    const dx = (e.clientX || lastMoveX) - startX;
+    track.style.transition = 'transform 520ms cubic-bezier(.22,.9,.3,1)';
+    if (dx > SWIPE_THRESHOLD) { goTo(index - 1); }
+    else if (dx < -SWIPE_THRESHOLD) { goTo(index + 1); }
+    else { update(); }
+    try { e.target.releasePointerCapture && e.target.releasePointerCapture(e.pointerId); } catch(err){}
+  }
+
+  // pointer events
+  viewport.addEventListener('pointerdown', onPointerDown, { passive: true });
+  window.addEventListener('pointermove', onPointerMove, { passive: true });
+  window.addEventListener('pointerup', endDrag, { passive: true });
+  window.addEventListener('pointercancel', endDrag, { passive: true });
+
+  // fallback touch events
+  viewport.addEventListener('touchstart', (ev) => {
+    const t = ev.changedTouches[0];
+    onPointerDown({ clientX: t.clientX, pointerType: 'touch', button: 0, target: ev.target, pointerId: 1 });
+  }, { passive: true });
+
+  window.addEventListener('touchmove', (ev) => {
+    const t = ev.changedTouches[0];
+    onPointerMove({ clientX: t.clientX });
+  }, { passive: true });
+
+  window.addEventListener('touchend', (ev) => {
+    const t = ev.changedTouches[0];
+    endDrag({ clientX: t.clientX, target: ev.target });
+  }, { passive: true });
+
+})();
+</script>
+
+<!-- NUEVO: script para controlar el estado del difuminado (persistente) -->
+<script>
+(function(){
+  const key = 'carouselBlur';
+  const toggle = document.getElementById('blurToggle');
+  const carousel = document.querySelector('.propiedades-carousel');
+  if (!toggle || !carousel) return;
+
+  // Leer preferencia (por defecto ON = difuminado activo)
+  const saved = localStorage.getItem(key);
+  const enabled = saved !== 'off';
+  toggle.checked = enabled;
+  carousel.classList.toggle('no-blur', !enabled);
+
+  // Cambiar estado al interactuar y persistir
+  toggle.addEventListener('change', () => {
+    const now = !!toggle.checked;
+    carousel.classList.toggle('no-blur', !now);
+    try { localStorage.setItem(key, now ? 'on' : 'off'); } catch(e) {}
+  });
+})();
+</script>
+
+<!--mauser para que funcionen los idiomas-->
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'es',
+      includedLanguages: 'en,zh-CN,hi,es,ar,bn,pt,ru,ja,fr',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    }, 'google_translate_element');
+  }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+  <!--Detecta si hay idioma guardado en la cookie y lo reaplica -->
+<script>
+  (function () {
+    const match = document.cookie.match(/googtrans=\/[a-zA-Z-]+\/([a-zA-Z-]+)/);
+    if (match) {
+      const lang = match[1];
+      document.cookie = `googtrans=/es/${lang};path=/`;
+    }
+  })();
+</script>
+
+<!--mauser de la cosa esa del boton flotante de WhatsApp-->
+<a href="https://wa.me/502XXXXXXXX?text=Hola%20STRUCTURA,%20me%20interesa%20una%20propiedad" 
+   class="whatsapp-float" target="_blank" aria-label="Contáctanos por WhatsApp">
+  <i class="fab fa-whatsapp"></i>
+</a> 
+
+<!--mauser del boton flotante S-->
+<a href="index.html" class="boton-flotante" aria-label="Ir a la página principal">
+  <span class="notranslate" translate="no">S</span>
+

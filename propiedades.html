@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propiedades - Structura</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+      /* Asegura que el navbar no se desliza */
+      .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background-color: var(--color-blanco);
+        padding: 1rem 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      @media (max-width: 768px) {
+        .navbar .container {
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
+        .navbar-logo-img {
+          flex: 1;
+          min-width: 150px;
+        }
+
+        /* don't fix order here; global CSS will move translator under the menu on mobile */
+        .navbar-traductor {
+          width: auto;
+          margin-top: 0;
+        }
+
+        .navbar-menu {
+          width: 100%;
+          flex-direction: column;
+          align-items: stretch;
+          padding-top: 0.5rem;
+          border-top: 1px solid #eee;
+          margin-top: 0.5rem;
+        }
+
+        /* removed theme-toggle override */
+      }
+
+      /* NUEVOS ESTILOS: Toggle de vistas + Carrusel en propiedades.html */
+      .propiedades-section-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin: 24px 0;
+      }
+
+      .view-toggle-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .view-toggle-label {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--text-color, #222);
+      }
+
+      .view-btn {
+        padding: 8px 14px;
+        border: 1px solid rgba(0,0,0,0.12);
+        background: #fff;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.22s;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .view-btn.active {
+        background: #ff6b19;
+        color: #fff;
+        border-color: #ff6b19;
+      }
+
+      /* Contenedor que alterna entre grid y carrusel */
+      .propiedades-container.view-grid .propiedades-grid { display: grid; }
+      .propiedades-container.view-grid .propiedades-carousel { display: none; }
+      .propiedades-container.view-carousel .propiedades-grid { display: none; }
+      .propiedades-container.view-carousel .propiedades-carousel { display: block; }
+
+      /* Carrusel styles (reutilizar del index.html) */
+      :root {
+        --carousel-gap: 26px;
+        --card-width: 320px;
+        --card-scale: 1.12;
+        --card-ease: cubic-bezier(.22,.9,.3,1);
+        --muted-blur: 4px;
+        --muted-opacity: 0.58;
+      }
+
+      .propiedades-carousel {
+        position: relative;
+        overflow: visible;
+        padding: 20px 0 56px;
+        width: 100%;
+        /* Asegura que el carrusel ocupe todo el ancho */
+        box-sizing: border-box;
+      }
+
+      .propiedades-carousel .carousel-viewport {
+        overflow: hidden;
+        outline: none;
+        touch-action: pan-y;
+        -ms-touch-action: pan-y;
+        width: 100%;
+        margin: 0 auto;
+        /* Para móviles, asegura el ancho completo */
+        box-sizing: border-box;
+      }
+
+      .carousel-track {
+        display: flex;
+        gap: var(--carousel-gap);
+        align-items: center;
+        transition: transform 520ms var(--card-ease);
+        will-change: transform;
+        padding: 12px 6px;
+        perspective: 1200px;
+        /* Para evitar scroll lateral en móviles */
+        min-width: 100%;
+      }
+
+      /* tarjeta en carrusel */
+      .propiedades-carousel .propiedad-card {
+        flex: 0 0 var(--card-width);
+        max-width: var(--card-width);
+        border-radius: 12px;
+        overflow: hidden;
+        background: transparent;
+        transition: transform 360ms var(--card-ease), box-shadow 360ms var(--card-ease), filter 360ms var(--card-ease), opacity 360ms var(--card-ease);
+        transform-origin: center center;
+        backface-visibility: hidden;
+      }
+
+      .propiedades-carousel .propiedad-imagen {
+        width: 100%;
+        height: 220px;
+        overflow: hidden;
+        position: relative;
+        background: #eee;
+      }
+
+      .propiedades-carousel .propiedad-imagen img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 520ms var(--card-ease);
+      }
+
+      .propiedades-carousel .propiedad-card:not(.is-active) {
+        filter: blur(var(--muted-blur)) grayscale(.28) contrast(.92);
+        opacity: var(--muted-opacity);
+        transform: translateY(8px) scale(.98) rotateY(-3deg);
+        pointer-events: auto;
+      }
+
+      .propiedades-carousel .propiedad-card.is-active {
+        transform: translateY(0) scale(var(--card-scale)) rotateY(0deg);
+        z-index: 4;
+        opacity: 1;
+        filter: none;
+        box-shadow: 0 28px 60px rgba(18,18,18,0.16);
+      }
+
+      .propiedades-carousel .propiedad-card.is-active .propiedad-imagen img {
+        transform: scale(1.06);
+      }
+
+      .propiedades-carousel .propiedad-card .propiedad-info {
+        position: relative;
+        background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.03) 60%, rgba(0,0,0,0.04) 100%);
+        padding: 18px;
+        border-top: 1px solid rgba(0,0,0,0.03);
+      }
+
+      .carousel-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.06);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+      }
+
+      .carousel-prev { left: 8px; }
+      .carousel-next { right: 8px; }
+      .carousel-nav i { color: #ff6b19; }
+
+      .carousel-dots {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        margin-top: 18px;
+      }
+
+      .carousel-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.12);
+        cursor: pointer;
+        border: none;
+        transition: transform 220ms, background 220ms;
+      }
+
+      .carousel-dot.is-active {
+        background: #ff6b19;
+        transform: scale(1.12);
+        box-shadow: 0 6px 12px rgba(255,107,25,0.12);
+      }
+
+      /* Difuminado solo en carrusel (no en grid) */
+      .propiedades-carousel.no-blur .propiedad-card:not(.is-active) {
+        filter: none !important;
+        opacity: 0.92 !important;
+        transform: translateY(4px) scale(0.995) rotateY(-1deg) !important;
+      }
+
+      /* Control de difuminado solo visible en carrusel */
+      .carousel-blur-control {
+        display: flex;
+      }
+
+      .propiedades-container.view-carousel .carousel-blur-control {
+        display: flex;
+      }
+
+      /* Switch toggle */
+      .switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .switch input { display: none; }
+
+      .switch .slider {
+        width: 44px;
+        height: 24px;
+        background: rgba(0,0,0,0.12);
+        border-radius: 999px;
+        position: relative;
+        transition: background 0.22s;
+      }
+
+      .switch .slider::after {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        top: 3px;
+        left: 3px;
+        background: #fff;
+        border-radius: 50%;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        transition: transform 0.22s;
+      }
+
+      .switch input:checked + .slider { background: #ff6b19; }
+      .switch input:checked + .slider::after { transform: translateX(20px); }
+
+      .switch .switch-label {
+        font-size: 0.95rem;
+        color: var(--text-color, #222);
+      }
+
+      @media (max-width: 900px) {
+        :root {
+          --card-width: calc(100vw - 48px); /* Ajustar el ancho de las tarjetas al viewport */
+          --carousel-gap: 12px; /* Reducir el espacio entre tarjetas */
+          --card-scale: 1.04; /* Escala más pequeña para móviles */
+          --muted-blur: 2px; /* Menor difuminado */
+          --muted-opacity: 0.78; /* Mayor opacidad */
+        }
+
+        .carousel-nav { display: none; } /* Ocultar botones de navegación en móviles */
+        .propiedades-carousel .carousel-viewport { padding: 6px 0; }
+        .propiedades-carousel .propiedad-imagen { height: 200px; } /* Ajustar altura de las imágenes */
+        .view-btn { padding: 6px 12px; font-size: 0.85rem; }
+        .propiedades-section-controls { flex-direction: column; align-items: flex-start; }
+        .propiedades-carousel { padding: 16px 0 40px; }
+        .carousel-track { padding: 0; }
+
+        /* OCULTAR SWITCH DE DIFUMINADO EN MOVILES */
+        .carousel-blur-control {
+          display: none !important;
+        }
+
+        /* DESACTIVAR DIFUMINADO EN MOVILES */
+        .propiedades-carousel .propiedad-card:not(.is-active) {
+          filter: none !important;
+          opacity: 0.92 !important;
+          transform: translateY(4px) scale(0.995) rotateY(-1deg) !important;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .propiedades-carousel .propiedad-card {
+          flex: 0 0 100%; /* Asegurar que las tarjetas ocupen el ancho completo */
+          max-width: 100%; /* Ajustar el ancho máximo */
+        }
+
+        .propiedades-carousel .carousel-viewport {
+          overflow-x: hidden; /* Evitar scroll lateral */
+          width: 100%; /* Asegurar que el viewport ocupe el ancho completo */
+        }
+
+        .propiedades-carousel {
+          padding: 0 16px; /* Ajustar el padding para evitar recortes */
+        }
+
+        .whatsapp-float {
+          bottom: 80px; /* Reubicar el botón flotante para evitar superposición */
+          right: 16px; /* Ajustar la posición en móviles */
+        }
+      }
+
+      @media (max-width: 480px) {
+        .propiedades-carousel .propiedad-card .propiedad-info {
+          padding: 12px; /* Reducir el padding interno de las tarjetas */
+        }
+
+        .propiedades-carousel .propiedad-imagen {
+          height: 180px; /* Reducir la altura de las imágenes en pantallas pequeñas */
+        }
+
+        .whatsapp-float {
+          bottom: 60px; /* Ajustar aún más la posición del botón flotante */
+        }
+      }
+
+      .propiedades-carousel .propiedad-card,
+      .propiedades-carousel .propiedad-card * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <a href="index.html" class="navbar-logo-img">
+                <img src="images/STRUCTURA LOGO HORIZONTAL NEGRO@3x.png" alt="Logo Structura">
+            </a>
+
+<!--mauser del selector de google-->            
+<div class="navbar-traductor">
+  <label for="google_translate_element" class="traductor-label">🌐 Idioma:</label>
+  <div id="google_translate_element"></div>
+</div>
+
+<!--menu del navar-->
+    <nav class="navbar-menu">
+	<a href="index.html" class="nav-link">Inicio</a>
+	<a href="propiedades.html" class="nav-link active">Propiedades</a>
+	<a href="exclusivos.html" class="nav-link">Exclusivos</a>
+	<a href="nosotros.html" class="nav-link">Nosotros</a>
+	<a href="resenas.html" class="nav-link">Reseñas</a>
+	<a href="contacto.html" class="nav-button">Contáctenos</a>
+
+	<button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar modo oscuro" title="Alternar modo oscuro">
+		<i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+		<span class="toggle-circle" aria-hidden="true"></span>
+		<i class="fas fa-moon icon-moon" aria-hidden="true"></i>
+	</button>
+</nav>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>Nuestras Propiedades Exclusivas</h1>
+            <p>Descubra la casa de sus sueños en el corazón de Antigua Guatemala.</p>
+        </div>
+    </section>
+
+    <!--mauser para que funcione lo del filtro de las propiedades-->
+    <section class="filtros">
+        <div class="container">
+            <nav class="filtro-nav">
+                <a href="#" class="filtro-link active" data-filter="all">Todos los Proyectos</a>
+                <a href="#" class="filtro-link" data-filter="entregado">Entregado</a>
+                <a href="#" class="filtro-link" data-filter="en-construccion">En Construcción</a>
+                <a href="#" class="filtro-link" data-filter="sobre-plano">Sobre Plano</a>
+            </nav>
+        </div>
+    </section>
+
+    <!--seccion del catalogo de las propiedades-->
+    <section class="catalogo-propiedades">
+        <div class="container">
+
+            <!-- NUEVOS CONTROLES: Vista Grid/Carrusel + Difuminado -->
+            <div class="propiedades-section-controls">
+              <div class="view-toggle-group">
+                <span class="view-toggle-label">Vista:</span>
+                <button class="view-btn view-grid-btn active" id="viewGridBtn" title="Ver como grid">
+                  <i class="fas fa-th"></i> Grid
+                </button>
+                <button class="view-btn view-carousel-btn" id="viewCarouselBtn" title="Ver como carrusel">
+                  <i class="fas fa-images"></i> Carrusel
+                </button>
+              </div>
+
+              <div class="carousel-blur-control">
+                <label class="switch" title="Activar o desactivar difuminado en carrusel">
+                  <input type="checkbox" id="carouselBlurToggle" checked>
+                  <span class="slider" aria-hidden="true"></span>
+                  <span class="switch-label">Difuminado</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Contenedor que alterna entre Grid y Carrusel -->
+            <div class="propiedades-container view-grid" id="propiedadesContainer">
+
+              <!-- VISTA GRID (existente) -->
+              <div class="propiedades-grid">
+                
+                <div class="propiedad-card" data-status="entregado">
+                    <div class="propiedad-imagen">
+                        <img src="images/elpilar-1.JPG" alt="Casa El Pilar">
+                        <span class="propiedad-estado">Entregado</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa El Pilar</h3>
+                        <p class="propiedad-ubicacion">Hacienda del Comendador</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 4 habs</span>
+                            <span><i class="fas fa-bath"></i> 4.5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 450 m²</span>
+                        </div>
+                        <a href="Casa el PIlar.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="entregado">
+                    <div class="propiedad-imagen">
+                        <img src="images/entreruinas-1.jpg" alt="Casa Entre Ruinas">
+                        <span class="propiedad-estado">Entregado</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa Entre Ruinas</h3>
+                        <p class="propiedad-ubicacion">Condado del Obispo</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 3 habs</span>
+                            <span><i class="fas fa-bath"></i> 3 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 380 m²</span>
+                        </div>
+                        <a href="Casa entre ruinas.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="entregado">
+                    <div class="propiedad-imagen">
+                        <img src="images/sancarlos-1.jpg" alt="Casa San Carlos">
+                        <span class="propiedad-estado">Entregado</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa San Carlos</h3>
+                        <p class="propiedad-ubicacion">San Juan del Obispo</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa_san_carlos.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="en-construccion">
+                    <div class="propiedad-imagen">
+                        <img src="images/3.jpeg" alt="Residencia Colonial El Cafetal">
+                        <span class="propiedad-estado">En Construcción</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa La Reunión</h3>
+                        <p class="propiedad-ubicacion">Cerca de La Recolección</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 4 habs</span>
+                            <span><i class="fas fa-bath"></i> 4 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 420 m²</span>
+                        </div>
+                        <a href="Casa La Reunión.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="entregado">
+                    <div class="propiedad-imagen">
+                        <img src="images/DSC07484-HDR.jpg" alt="Villa Colonial Jacarandas">
+                        <span class="propiedad-estado">Entregado</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa Ocasus</h3>
+                        <p class="propiedad-ubicacion">Condado del Obispo</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 3 habs</span>
+                            <span><i class="fas fa-bath"></i> 3.5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 390 m²</span>
+                        </div>
+                        <a href="Casa Ocasus.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="sobre-plano">
+                    <div class="propiedad-imagen">
+                        <img src="images/Structura x Casa N8-116.jpg" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">Sobre Plano</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa Reliqua</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="Casa Reliqua.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <!--nuevas propiedades-->
+                <div class="propiedad-card" data-status="sobre-plano">
+                    <div class="propiedad-imagen">
+                        <img src="images/casa 15.jpg" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">Sobre Plano</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa 15</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa 15.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="en-construccion">
+                    <div class="propiedad-imagen">
+                        <img src="images/APTO SantaAna.jpg" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">En Construcción</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa APTO.Santa Ana</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa APTO.SantaAna.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="en-construccion">
+                    <div class="propiedad-imagen">
+                        <img src="images/bosques 2.jpg" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">En Construcción</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa bosques 2</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa bosques2.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="en-construccion">
+                    <div class="propiedad-imagen">
+                        <img src="images/bosques 4.jpg" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">En Construcción</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa bosques 4</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa bosques4.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="entregado">
+                    <div class="propiedad-imagen">
+                        <img src="images/calvario.JPG" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">Entregado</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa calvario</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa calvario.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="sobre-plano">
+                    <div class="propiedad-imagen">
+                        <img src="images/casa catarina.jpg" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">Sobre Plano</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa Catarina</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa catarina.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="sobre-plano">
+                    <div class="propiedad-imagen">
+                        <img src="images/ferreria.jpg" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">Sobre Plano</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa Ferreria</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa ferreria.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="en-construccion">
+                    <div class="propiedad-imagen">
+                        <img src="images/casa la esperanza.jpg" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">En Construcción</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa Esperanza</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa la esperanza.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="sobre-plano">
+                    <div class="propiedad-imagen">
+                        <img src="images/M3.jpg" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">Sobre Plano</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa M3</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa M3.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="sobre-plano">
+                    <div class="propiedad-imagen">
+                        <img src="images/M9.jpg" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">Sobre Plano</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa M9</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa M9.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="en-construccion">
+                    <div class="propiedad-imagen">
+                        <img src="images/Planum.jpg" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">En Construcción</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa Planum</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa planum.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="en-construccion">
+                    <div class="propiedad-imagen">
+                        <img src="images/puerta del cielo.jpg" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">En Construcción</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa Puerta del Cielo</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa puerta del cielo.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="en-construccion">
+                    <div class="propiedad-imagen">
+                        <img src="images/skaffi.JPG" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">En Construcción</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa Skaffi</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa sikaffi.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="en-construccion">
+                    <div class="propiedad-imagen">
+                        <img src="images/Stanza.JPG" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">En Construcción</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa Stanza</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa stanza.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="sobre-plano">
+                    <div class="propiedad-imagen">
+                        <img src="images/via de la luz.jpg" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">Sobre Plano</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa Via de Luz</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa via de luz.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+
+                <div class="propiedad-card" data-status="sobre-plano">
+                    <div class="propiedad-imagen">
+                        <img src="images/casa46.jpg" alt="Casa de Lujo San Juan">
+                        <span class="propiedad-estado">Sobre Plano</span>
+                    </div>
+                    <div class="propiedad-info">
+                        <h3>Casa 46</h3>
+                        <p class="propiedad-ubicacion">San Pedro El Alto</p>
+                        <div class="propiedad-specs">
+                            <span><i class="fas fa-bed"></i> 5 habs</span>
+                            <span><i class="fas fa-bath"></i> 5 baños</span>
+                            <span><i class="fas fa-ruler-combined"></i> 520 m²</span>
+                        </div>
+                        <a href="casa46.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+                    </div>
+                </div>
+                <!--fin de nuevas propiedades-->
+
+              </div>
+              <!-- FIN de .propiedades-grid - CIERRE CORRECTO -->
+
+              <!-- VISTA CARRUSEL (hermano de .propiedades-grid) -->
+              <div class="propiedades-carousel" id="propiedadesCarousel">
+                <div class="carousel-viewport">
+                  <div class="carousel-track" id="propCarouselTrack">
+                    <!-- se clonarán automáticamente desde la grid -->
+                  </div>
+                </div>
+                <button class="carousel-nav carousel-prev" id="propCarouselPrev" aria-label="Anterior">
+                  <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                </button>
+                <button class="carousel-nav carousel-next" id="propCarouselNext" aria-label="Siguiente">
+                  <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                </button>
+                <div class="carousel-dots" id="propCarouselDots"></div>
+              </div>
+
+            </div>
+            <!-- FIN de .propiedades-container -->
+
+        </div>
+    </section>
+
+    <!--parte inferior de la pagina-->        
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <img src="images/STRUCTURA LOGO VERTICAL BLANCO@3x.png" alt="Logo Structura Blanco" class="footer-logo">
+                <p>Diseño y construcción de casas estilo colonial en Antigua Guatemala. Creamos legados arquitectónicos.</p>
+            </div>
+            <div class="footer-col">
+	<h4>Enlaces Rápidos</h4>
+	<ul>
+		<li><a href="index.html">Inicio</a></li>
+		<li><a href="propiedades.html">Propiedades</a></li>
+		<li><a href="exclusivos.html">Exclusivos</a></li>
+		<li><a href="nosotros.html">Nosotros</a></li>
+	</ul>
+</div>
+            <div class="footer-col">
+                <h4>Contáctenos</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Antigua Guatemala, Sacatepéquez</li>
+                    <li><i class="fas fa-phone"></i> (+502) 7832-9758</li>
+                    <li><i class="fas fa-envelope"></i> informacion@structura.com.gt</li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Síganos</h4>
+
+                <!--redes de la emrpesa-->
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Structura. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Script externo (filtrado + theme-toggle) -->
+    <script src="js/theme.js"></script>
+
+    <!-- SCRIPT: Toggle de vistas Grid/Carrusel + Filtros + Carrusel con difuminado independiente -->
+    <script>
+(function(){
+  const keyView = 'propiedadesView';
+  const keyBlur = 'propiedadesCarouselBlur';
+
+  const container = document.getElementById('propiedadesContainer');
+  const gridBtn = document.getElementById('viewGridBtn');
+  const carouselBtn = document.getElementById('viewCarouselBtn');
+  const gridWrapper = document.querySelector('.propiedades-grid');
+  const carouselWrapper = document.getElementById('propiedadesCarousel');
+  const track = document.getElementById('propCarouselTrack');
+  const blurToggle = document.getElementById('carouselBlurToggle');
+  const filtroLinks = document.querySelectorAll('.filtro-link');
+
+  if (!container || !gridBtn || !carouselBtn) return;
+
+  // Cargar preferencia de vista
+  const savedView = localStorage.getItem(keyView) || 'grid';
+  setView(savedView);
+
+  function setView(view){
+    if (view === 'carousel') {
+      container.classList.remove('view-grid');
+      container.classList.add('view-carousel');
+      gridBtn.classList.remove('active');
+      carouselBtn.classList.add('active');
+      // No cambiar display manualmente, deja que el CSS lo haga
+      // clonar tarjetas del grid al carrusel SIEMPRE que cambie el filtro o la vista
+      cloneVisibleCards();
+      localStorage.setItem(keyView, 'carousel');
+    } else {
+      container.classList.add('view-grid');
+      container.classList.remove('view-carousel');
+      gridBtn.classList.add('active');
+      carouselBtn.classList.remove('active');
+      localStorage.setItem(keyView, 'grid');
+    }
+  }
+
+  // Clonar solo tarjetas visibles (según filtro actual)
+  function cloneVisibleCards(){
+    track.innerHTML = ''; // limpiar carrusel
+    const cards = gridWrapper.querySelectorAll('.propiedad-card');
+    let clonedCount = 0;
+
+    cards.forEach(card => {
+      // solo clonar si la tarjeta está visible (display != none)
+      if (window.getComputedStyle(card).display !== 'none') {
+        const clone = card.cloneNode(true);
+        clone.classList.remove('is-active');
+        track.appendChild(clone);
+        clonedCount++;
+      }
+    });
+
+    // reinicializar carrusel si hay tarjetas
+    if (clonedCount > 0) {
+      setTimeout(initCarousel, 100);
+    }
+  }
+
+  gridBtn.addEventListener('click', () => setView('grid'));
+  carouselBtn.addEventListener('click', () => setView('carousel'));
+
+  // Cargar preferencia de difuminado en carrusel
+  const savedBlur = localStorage.getItem(keyBlur);
+  const blurEnabled = savedBlur !== 'off';
+  blurToggle.checked = blurEnabled;
+  carouselWrapper.classList.toggle('no-blur', !blurEnabled);
+
+  // Sincronizar toggle de difuminado
+  blurToggle.addEventListener('change', () => {
+    const now = !!blurToggle.checked;
+    carouselWrapper.classList.toggle('no-blur', !now);
+    try { localStorage.setItem(keyBlur, now ? 'on' : 'off'); } catch(e) {}
+  });
+
+  // Listeners para filtros
+  filtroLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const filter = link.getAttribute('data-filter');
+
+      // actualizar clase activa en filtros
+      filtroLinks.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+
+      // filtrar tarjetas en grid
+      const cards = gridWrapper.querySelectorAll('.propiedad-card');
+      cards.forEach(card => {
+        if (filter === 'all') {
+          card.style.display = '';
+        } else {
+          const status = card.getAttribute('data-status');
+          card.style.display = status === filter ? '' : 'none';
+        }
+      });
+
+      // si estamos en vista carrusel, re-clonar tarjetas visibles
+      if (container.classList.contains('view-carousel')) {
+        cloneVisibleCards();
+      }
+    });
+  });
+
+  // Inicializar carrusel
+  function initCarousel(){
+    const cards = Array.from(track.children);
+    const prev = document.getElementById('propCarouselPrev');
+    const next = document.getElementById('propCarouselNext');
+    const dotsWrap = document.getElementById('propCarouselDots');
+    const viewport = track.parentElement;
+
+    if (!cards.length || !viewport) return;
+
+    // --- NO CLONAR TARJETAS ---
+    const allCards = Array.from(track.children); // Usar solo las tarjetas originales
+    let index = 0; // Iniciar en la primera tarjeta real
+    let isTransitioning = false;
+
+    if (viewport && !viewport.hasAttribute('tabindex')) viewport.tabIndex = 0;
+
+    dotsWrap.innerHTML = '';
+    cards.forEach((c, i) => {
+      const dot = document.createElement('button');
+      dot.className = 'carousel-dot';
+      dot.type = 'button';
+      dot.setAttribute('aria-label', 'Ir a la diapositiva ' + (i + 1));
+      dot.addEventListener('click', () => goTo(i));
+      dotsWrap.appendChild(dot);
+    });
+    const dots = Array.from(dotsWrap.children);
+
+    let baseTranslate = 0;
+
+    function update(transition = true){
+      const gap = parseFloat(getComputedStyle(track).gap) || 26;
+      const cardWidth = allCards[0].getBoundingClientRect().width;
+      const viewportW = viewport.getBoundingClientRect().width;
+
+      const cardCenter = (cardWidth + gap) * index + cardWidth / 2;
+      const viewportCenter = viewportW / 2;
+      baseTranslate = viewportCenter - cardCenter;
+
+      track.style.transition = transition ? 'transform 520ms cubic-bezier(.22,.9,.3,1)' : 'none';
+      track.style.transform = 'translateX(' + baseTranslate + 'px)';
+
+      allCards.forEach((c, i) => c.classList.toggle('is-active', i === index));
+      dots.forEach((d, i) => d.classList.toggle('is-active', i === index));
+    }
+
+    function goTo(i){
+      if (isTransitioning) return;
+      isTransitioning = true;
+      index = i;
+      update(true);
+
+      track.addEventListener('transitionend', () => {
+        isTransitioning = false;
+      }, { once: true });
+    }
+
+    prev && prev.addEventListener('click', () => goTo(Math.max(index - 1, 0)));
+    next && next.addEventListener('click', () => goTo(Math.min(index + 1, allCards.length - 1)));
+
+    viewport.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') goTo(Math.max(index - 1, 0));
+      if (e.key === 'ArrowRight') goTo(Math.min(index + 1, allCards.length - 1));
+    });
+
+    /* ---------- POINTER / TOUCH SWIPE RESTAURADO ---------- */
+    let pointerDown = false;
+    let startX = 0;
+    let currentTranslate = 0;
+    let lastMoveX = 0;
+    const SWIPE_THRESHOLD = 50;
+
+    function onPointerDown(e){
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      pointerDown = true;
+      startX = e.clientX;
+      lastMoveX = startX;
+      track.style.transition = 'none';
+      currentTranslate = baseTranslate;
+      try { e.target.setPointerCapture && e.target.setPointerCapture(e.pointerId); } catch(err){}
+    }
+
+    function onPointerMove(e){
+      if (!pointerDown) return;
+      const dx = e.clientX - startX;
+      lastMoveX = e.clientX;
+      track.style.transform = 'translateX(' + (currentTranslate + dx) + 'px)';
+    }
+
+    function endDrag(e){
+      if (!pointerDown) return;
+      pointerDown = false;
+      const dx = (e.clientX || lastMoveX) - startX;
+      track.style.transition = 'transform 520ms cubic-bezier(.22,.9,.3,1)';
+      if (dx > SWIPE_THRESHOLD) { goTo(Math.max(index - 1, 0)); }
+      else if (dx < -SWIPE_THRESHOLD) { goTo(Math.min(index + 1, allCards.length - 1)); }
+      else { update(); }
+      try { e.target.releasePointerCapture && e.target.releasePointerCapture(e.pointerId); } catch(err){}
+    }
+
+    viewport.addEventListener('pointerdown', onPointerDown, { passive: true });
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('pointerup', endDrag, { passive: true });
+    window.addEventListener('pointercancel', endDrag, { passive: true });
+
+    viewport.addEventListener('touchstart', (ev) => {
+      const t = ev.changedTouches[0];
+      onPointerDown({ clientX: t.clientX, pointerType: 'touch', button: 0, target: ev.target, pointerId: 1 });
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (ev) => {
+      const t = ev.changedTouches[0];
+      onPointerMove({ clientX: t.clientX });
+    }, { passive: true });
+
+    window.addEventListener('touchend', (ev) => {
+      const t = ev.changedTouches[0];
+      endDrag({ clientX: t.clientX, target: ev.target });
+    }, { passive: true });
+
+    let t;
+    window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(update, 120); });
+
+    index = 0;
+    update(false);
+  }
+})();
+    </script>
+
+    <!--mauser para que funcionen los idiomas-->
+    <script type="text/javascript">
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+          pageLanguage: 'es',
+          includedLanguages: 'en,zh-CN,hi,es,ar,bn,pt,ru,ja,fr',
+          layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        }, 'google_translate_element');
+      }
+    </script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <!--Detecta si hay idioma guardado en la cookie y lo reaplica -->
+    <script>
+      (function () {
+        const match = document.cookie.match(/googtrans=\/[a-zA-Z-]+\/([a-zA-Z-]+)/);
+        if (match) {
+          const lang = match[1];
+          document.cookie = `googtrans=/es/${lang};path=/`;
+        }
+      })();
+    </script>
+
+    <!--mauser de la cosa esa del boton flotante de WhatsApp-->
+    <a href="https://wa.me/502XXXXXXXX?text=Hola%20STRUCTURA,%20me%20interesa%20una%20propiedad" 
+       class="whatsapp-float" target="_blank" aria-label="Contáctanos por WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+    </a> 
+
+    <!--mauser del boton flotante S-->
+    <a href="index.html" class="boton-flotante" aria-label="Ir a la página principal">
+      <span class="notranslate" translate="no">S</span>
+    </a>
+
+</body>
+</html>

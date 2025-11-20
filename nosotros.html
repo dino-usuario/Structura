@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosotros - Structura</title>
+    
+    <!-- Init rápido del tema para evitar FOUC -->
+    <script>
+        (function(){
+            try {
+                var saved = localStorage.getItem('theme');
+                if (saved === 'dark') document.documentElement.setAttribute('data-theme','dark');
+                else if (!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.setAttribute('data-theme','dark');
+                }
+            } catch(e) { /* no-op si no existe localStorage */ }
+        })();
+    </script>
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+      /* Asegura que el navbar no se desliza */
+      .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background-color: var(--color-blanco);
+        padding: 1rem 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      @media (max-width: 768px) {
+        .navbar .container {
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
+        .navbar-logo-img {
+          flex: 1;
+          min-width: 150px;
+        }
+
+        /* allow global CSS to place translator after menu on mobile */
+        .navbar-traductor {
+          width: auto;
+          margin-top: 0;
+        }
+
+        .navbar-menu {
+          width: 100%;
+          flex-direction: column;
+          align-items: stretch;
+          padding-top: 0.5rem;
+          border-top: 1px solid #eee;
+          margin-top: 0.5rem;
+        }
+
+        /* no explicit .theme-toggle override here */
+      }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <a href="index.html" class="navbar-logo-img">
+                <img src="images/STRUCTURA LOGO HORIZONTAL NEGRO@3x.png" alt="Logo Structura">
+            </a>
+
+            <!--mauser del selector de idiomas-->
+            <div class="navbar-traductor">
+              <label for="google_translate_element" class="traductor-label">🌐 Idioma:</label>
+              <div id="google_translate_element"></div>
+            </div>
+
+            <!--menu del navar ese-->
+            <nav class="navbar-menu">
+                <a href="index.html" class="nav-link">Inicio</a>
+                <a href="propiedades.html" class="nav-link">Propiedades</a>
+                <a href="exclusivos.html" class="nav-link">Exclusivos</a>
+                <a href="nosotros.html" class="nav-link active">Nosotros</a>
+                <a href="resenas.html" class="nav-link">Reseñas</a>
+                <a href="contacto.html" class="nav-button">Contáctenos</a>
+
+                <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar modo oscuro" title="Alternar modo oscuro">
+                    <i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+                    <span class="toggle-circle" aria-hidden="true"></span>
+                    <i class="fas fa-moon icon-moon" aria-hidden="true"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+<!--una pequeña seccion de mini historia-->
+    <section class="page-header">
+        <div class="container">
+            <h1>Nuestra Historia y Filosofía</h1>
+            <p>Más de 17 años creando legados arquitectónicos en Antigua Guatemala.</p>
+        </div>
+    </section>
+
+    <section class="about-story">
+        <div class="container about-grid">
+            <div class="about-text">
+                <span class="subtitulo-naranja">NUESTRA PASIÓN</span>
+                <h2>El Arte de Construir en Antigua</h2>
+                <p>Con más de 17 años de experiencia, el diseño y construcción de casas en la Antigua Guatemala ha demostrado ser una verdadera obra de arte. La creatividad y la innovación se combinan con la tecnología para crear hogares que reflejan el dinamismo y la belleza de esta histórica ciudad.</p>
+                <p>Cada casa es única, con detalles cuidadosamente diseñados y construidos para proporcionar una experiencia de vida excepcional. La pasión por el diseño y la construcción se puede ver en cada proyecto, y el resultado final es una casa que se convierte en un hogar verdaderamente excepcional.</p>
+            </div>
+            <div class="about-image">
+                <img src="images/DSC03322.jpg" alt="Detalle de construcción colonial Structura">
+            </div>
+        </div>
+    </section>
+<!--seccion de  materiales y tecnicas de construccion-->
+    <section class="materiales-tecnicas">
+      <h2>Materiales y Técnicas construccion</h2>
+      <div class="materiales-grid">
+        <div class="material-item">
+          <button class="material-toggle">
+            <i class="fas fa-mountain"></i> Adobe y piedra volcánica
+          </button>
+          <div class="material-info">
+            <p>Resistentes y tradicionales, ideales para construcciones coloniales con carácter térmico.</p>
+          </div>
+        </div>
+        <div class="material-item">
+          <button class="material-toggle">
+            <i class="fas fa-tree"></i> Madera de cedro y caoba
+          </button>
+          <div class="material-info">
+            <p>Duraderas y elegantes, perfectas para detalles artesanales y estructuras visibles.</p>
+          </div>
+        </div>
+        <div class="material-item">
+          <button class="material-toggle">
+            <i class="fas fa-warehouse"></i> Teja artesanal
+          </button>
+          <div class="material-info">
+            <p>Ofrece aislamiento térmico y un acabado rústico que conecta con la esencia antigüeña.</p>
+          </div>
+        </div>
+        <div class="material-item">
+          <button class="material-toggle">
+            <i class="fas fa-archway"></i> Técnicas de bóveda y arco
+          </button>
+          <div class="material-info">
+            <p>Inspiradas en la arquitectura colonial, permiten espacios amplios y elegantes.</p>
+          </div>
+        </div>
+        <div class="material-item">
+          <button class="material-toggle">
+            <i class="fas fa-paint-roller"></i> Estuco y pigmentos naturales
+          </button>
+          <div class="material-info">
+            <p>Aplicados en muros para lograr texturas únicas y colores que envejecen con gracia.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!--seccion del equipo y fundadores de la empresa-->
+    <section class="quote-section">
+        <div class="container">
+            <h2>"Excelencia ejemplar."</h2>
+            <blockquote>
+                En nuestra empresa, la excelencia ejemplar es la piedra angular de nuestra dedicación al éxito de nuestros clientes y proyectos, en todo momento y en cada paso del proceso.
+            </blockquote>
+            <p class="quote-author">
+                Jose Miguel Asturias
+                <span>CEO & Director, Structura</span>
+            </p>
+        </div>
+    </section>
+
+    <section class="team-section">
+        <div class="container">
+            <div class="titulo-seccion">
+                <span class="subtitulo-naranja">NUESTROS LÍDERES</span>
+                <h2>Equipo Directivo</h2>
+            </div>
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="team-image">
+                        <img src="images/arq-jose-miguel-asturias.jpg" alt="Arquitecto Jose Miguel Asturias">
+                    </div>
+                    <div class="team-info">
+                        <h4>Arq. Jose Miguel Asturias</h4>
+                        <p>CEO & Director</p>
+                    </div>
+                </div>
+                <div class="team-card">
+                    <div class="team-image">
+                        <img src="images/arq-luis-quisque.jpg" alt="Arquitecto Luis José Quisque">
+                    </div>
+                    <div class="team-info">
+                        <h4>Arq. Luis José Quisque</h4>
+                        <p>Gerente General Operativo</p>
+                    </div>
+                </div>
+                <div class="team-card">
+                    <div class="team-image">
+                        <img src="images/ing-marlon-marroquin.jpg" alt="Ingeniero Marlon Marroquín">
+                    </div>
+                    <div class="team-info">
+                        <h4>Ing. Marlon Marroquín</h4>
+                        <p>Gerente General Administrativo</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<!--seccion de mision y vision-->  
+    <section class="mision-vision">
+        <div class="container mv-grid">
+            <div class="mv-card">
+                <h3><i class="fas fa-bullseye"></i> Nuestra Misión</h3>
+                <p>Construcción de estilos de vida en La Antigua Guatemala.</p>
+            </div>
+            <div class="mv-card">
+                <h3><i class="fas fa-eye"></i> Nuestra Visión</h3>
+                <p>Ser los mejores del mundo en diseñar y construir proyectos en Antigua Guatemala, teniendo el mejor equipo, haciendo en cada paso del proceso una experiencia de vida.</p>
+            </div>
+        </div>
+    </section>
+
+    <!--seccion de preguntas frecuentes-->
+    <section class="faq">
+      <h2>Preguntas Frecuentes</h2>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <button class="faq-toggle">
+            <i class="fas fa-home"></i> ¿Qué tipo de propiedades ofrece STRUCTURA?
+          </button>
+          <div class="faq-info">
+            <p>Casas coloniales, residencias modernas y espacios comerciales en Antigua Guatemala y alrededores.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-toggle">
+            <i class="fas fa-calendar-check"></i> ¿Puedo solicitar una visita guiada?
+          </button>
+          <div class="faq-info">
+            <p>Sí, puedes agendar una visita desde nuestro formulario de contacto o por WhatsApp.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-toggle">
+            <i class="fas fa-drafting-compass"></i> ¿STRUCTURA ofrece diseño y construcción?
+          </button>
+          <div class="faq-info">
+            <p>Contamos con arquitectos y constructores especializados en proyectos personalizados.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-toggle">
+            <i class="fas fa-money-check-alt"></i> ¿Qué métodos de pago aceptan?
+          </button>
+          <div class="faq-info">
+            <p>Aceptamos transferencias bancarias, pagos en cuotas y opciones personalizadas según el proyecto.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!--parte inferior de la pagina-->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <img src="images/STRUCTURA LOGO VERTICAL BLANCO@3x.png" alt="Logo Structura Blanco" class="footer-logo">
+                <p>Diseño y construcción de casas estilo colonial en Antigua Guatemala.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Enlaces Rápidos</h4>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="propiedades.html">Propiedades</a></li>
+                    <li><a href="exclusivos.html">Exclusivos</a></li>
+                    <li><a href="nosotros.html">Nosotros</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contáctenos</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Antigua Guatemala, Sacatepéquez</li>
+                    <li><i class="fas fa-phone"></i> (+502) 7832-9758</li>
+                    <li><i class="fas fa-envelope"></i> informacion@structura.com.gt</li>
+                </ul>
+            </div>
+            <!--redes de la empresa-->
+            <div class="footer-col">
+                <h4>Síganos</h4>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Structura. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Script centralizado (ÚNICO) -->
+    <script src="js/theme.js"></script>
+
+    <!-- Google Translate -->
+    <script type="text/javascript">
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+          pageLanguage: 'es',
+          includedLanguages: 'en,zh-CN,hi,es,ar,bn,pt,ru,ja,fr',
+          layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        }, 'google_translate_element');
+      }
+    </script>
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <!-- Detecta idioma guardado -->
+    <script>
+      (function () {
+        const match = document.cookie.match(/googtrans=\/[a-zA-Z-]+\/([a-zA-Z-]+)/);
+        if (match) {
+          const lang = match[1];
+          document.cookie = `googtrans=/es/${lang};path=/`;
+        }
+      })();
+    </script>
+
+    <!-- WhatsApp flotante -->
+    <a href="https://wa.me/502XXXXXXXX?text=Hola%20STRUCTURA,%20me%20interesa%20una%20propiedad" 
+       class="whatsapp-float" target="_blank" aria-label="Contáctanos por WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+    </a>
+
+<!--mauser del boton flotante S-->
+<a href="index.html" class="boton-flotante" aria-label="Ir a la página principal">
+  <span class="notranslate" translate="no">S</span>
+
+</body>
+</html>

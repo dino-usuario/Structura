@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Exclusivos - Structura</title>
+	
+	<!-- Init rápido del tema para evitar FOUC y asegurar modo oscuro según localStorage o preferencia del sistema -->
+	<script>
+		(function(){
+			try {
+				var saved = localStorage.getItem('theme');
+				if (saved === 'dark') document.documentElement.setAttribute('data-theme','dark');
+				else if (!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+					document.documentElement.setAttribute('data-theme','dark');
+				}
+			} catch(e) { /* no-op en entornos sin localStorage */ }
+		})();
+	</script>
+	<link rel="stylesheet" href="style.css">
+	<!-- Swiper CSS para carrusel -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css"/>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<style>
+		/* Asegurara el navbar responsivo sin deslizamiento */
+		.navbar {
+			position: sticky;
+			top: 0;
+			z-index: 100;
+			background-color: var(--color-blanco);
+			padding: 1rem 0;
+			border-bottom: 1px solid #eee;
+		}
+
+		@media (max-width: 768px) {
+			.navbar .container {
+				flex-wrap: wrap;
+				gap: 0.5rem;
+			}
+
+			.navbar-logo-img {
+				flex: 1;
+				min-width: 150px;
+			}
+
+			/* let global stylesheet control translator order/placement */
+			.navbar-traductor {
+				width: auto;
+				margin-top: 0;
+			}
+
+			.navbar-menu {
+				width: 100%;
+				flex-direction: column;
+				align-items: stretch;
+				padding-top: 0.5rem;
+				border-top: 1px solid #eee;
+				margin-top: 0.5rem;
+			}
+
+			/* removed .theme-toggle forcing so global fixed position works */
+		}
+
+		.vista-toggle {
+			display: flex;
+			justify-content: flex-end;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
+		}
+		.vista-toggle button {
+			background: none;
+			border: 1px solid #ccc;
+			padding: 0.5rem 1rem;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 1rem;
+			transition: background 0.2s, border 0.2s;
+		}
+		.vista-toggle button.active {
+			background: var(--color-primario, #222);
+			color: #fff;
+			border-color: var(--color-primario, #222);
+		}
+		/* Oculta el grid/carrusel según la vista */
+		.propiedades-grid,
+		.propiedades-carrusel {
+			display: none;
+		}
+		.propiedades-grid.active,
+		.propiedades-carrusel.active {
+			display: grid;
+		}
+		.propiedades-carrusel.active {
+			display: block;
+		}
+		/* Swiper tamaño */
+		.swiper {
+			width: 100%;
+			padding-bottom: 2rem;
+		}
+		.swiper-slide {
+			display: flex;
+			justify-content: center;
+		}
+
+		/* Carrusel estilo tipo "coverflow" */
+		.propiedades-carrusel {
+			position: relative;
+			padding-top: 1rem;
+			padding-bottom: 2.5rem;
+		}
+		.swiper {
+			width: 100%;
+			max-width: 1100px;
+			margin: 0 auto;
+			padding-bottom: 3.5rem;
+		}
+		.swiper-slide {
+			display: flex;
+			justify-content: center;
+			align-items: stretch;
+			transition: filter 0.3s, transform 0.3s, opacity 0.3s;
+			filter: blur(3px);
+			opacity: 0.4;
+			transform: scale(0.92);
+			z-index: 1;
+		}
+		.swiper-slide.swiper-slide-active {
+			filter: none;
+			opacity: 1;
+			transform: scale(1.04);
+			z-index: 2;
+		}
+		.swiper-slide.swiper-slide-next,
+		.swiper-slide.swiper-slide-prev {
+			filter: blur(2px);
+			opacity: 0.7;
+			transform: scale(0.97);
+			z-index: 1;
+		}
+		/* Card dentro del carrusel */
+		.propiedades-carrusel .propiedad-card {
+			width: 350px;
+			max-width: 95vw;
+			background: #fff;
+			border-radius: 18px;
+			box-shadow: 0 4px 24px 0 rgba(0,0,0,0.10);
+			overflow: hidden;
+			transition: box-shadow 0.2s;
+			border: none;
+		}
+		.propiedades-carrusel .propiedad-imagen img {
+			width: 100%;
+			height: 200px;
+			object-fit: cover;
+			display: block;
+		}
+		.propiedades-carrusel .propiedad-estado {
+			position: absolute;
+			top: 12px;
+			left: 12px;
+			background: #ff6a1a;
+			color: #fff;
+			font-weight: bold;
+			padding: 4px 16px;
+			border-radius: 8px;
+			font-size: 1rem;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+		}
+		.propiedades-carrusel .propiedad-imagen {
+			position: relative;
+		}
+		.propiedades-carrusel .propiedad-info {
+			padding: 1.2rem 1.2rem 1.5rem 1.2rem;
+			background: #fff;
+		}
+		.propiedades-carrusel .propiedad-info h3 {
+			font-size: 1.35rem;
+			font-weight: 700;
+			margin: 0 0 0.3rem 0;
+			color: #222;
+		}
+		.propiedades-carrusel .propiedad-ubicacion {
+			color: #888;
+			font-size: 1rem;
+			margin-bottom: 0.7rem;
+		}
+		.propiedades-carrusel .propiedad-specs {
+			display: flex;
+			justify-content: flex-start;
+			gap: 1.2rem;
+			margin-bottom: 1.1rem;
+			color: #ff6a1a;
+			font-weight: 600;
+			font-size: 1.05rem;
+		}
+		.propiedades-carrusel .btn.btn-primary-outline {
+			display: block;
+			width: 100%;
+			margin-top: 0.5rem;
+			padding: 0.7rem 0;
+			background: #fff;
+			color: #ff6a1a;
+			border: 2px solid #ff6a1a;
+			border-radius: 8px;
+			font-weight: bold;
+			font-size: 1.1rem;
+			text-align: center;
+			transition: background 0.2s, color 0.2s;
+		}
+		.propiedades-carrusel .btn.btn-primary-outline:hover {
+			background: #ff6a1a;
+			color: #fff;
+		}
+		/* Swiper navigation buttons */
+		.swiper-button-next, .swiper-button-prev {
+			width: 44px;
+			height: 44px;
+			background: #fff;
+			border-radius: 50%;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.13);
+			color: #ff6a1a;
+			top: 50%;
+			transform: translateY(-50%);
+			transition: background 0.2s, color 0.2s;
+			border: 1.5px solid #eee;
+		}
+		.swiper-button-next:hover, .swiper-button-prev:hover {
+			background: #ff6a1a;
+			color: #fff;
+		}
+		.swiper-button-next:after, .swiper-button-prev:after {
+			font-size: 1.5rem;
+			font-weight: bold;
+		}
+		.swiper-button-prev {
+			left: -24px;
+		}
+		.swiper-button-next {
+			right: -24px;
+		}
+		/* Swiper pagination dots */
+		.swiper-pagination {
+			bottom: 0;
+			text-align: center;
+		}
+		.swiper-pagination-bullet {
+			width: 12px;
+			height: 12px;
+			background: #ff6a1a;
+			opacity: 0.25;
+			margin: 0 5px !important;
+			transition: opacity 0.2s, background 0.2s;
+		}
+		.swiper-pagination-bullet-active {
+			opacity: 1;
+			background: #ff6a1a;
+		}
+		@media (max-width: 600px) {
+			.propiedades-carrusel .propiedad-card {
+				width: 95vw;
+			}
+			.swiper-button-next, .swiper-button-prev {
+				display: none;
+			}
+		}
+	</style>
+</head>
+<body>
+	<header class="navbar">
+		<div class="container">
+			<a href="index.html" class="navbar-logo-img">
+				<img src="images/STRUCTURA LOGO HORIZONTAL NEGRO@3x.png" alt="Logo Structura">
+			</a>
+
+<!--mauser del selector de idiomas del googlñe-->
+<div class="navbar-traductor">
+  <label for="google_translate_element" class="traductor-label">🌐 Idioma:</label>
+  <div id="google_translate_element"></div>
+</div>
+
+			<nav class="navbar-menu">
+				<a href="index.html" class="nav-link">Inicio</a>
+				<a href="propiedades.html" class="nav-link">Propiedades</a>
+				<a href="exclusivos.html" class="nav-link active">Exclusivos</a>
+				<a href="nosotros.html" class="nav-link">Nosotros</a>
+				<a href="resenas.html" class="nav-link">Reseñas</a>
+				<a href="contacto.html" class="nav-button">Contáctenos</a>
+
+				<button id="theme-toggle" class="theme-toggle" type="button" aria-label="Alternar modo oscuro" title="Alternar modo oscuro">
+					<i class="fas fa-sun icon-sun" aria-hidden="true"></i>
+					<span class="toggle-circle" aria-hidden="true"></span>
+					<i class="fas fa-moon icon-moon" aria-hidden="true"></i>
+				</button>
+			</nav>
+		</div>
+	</header>
+
+	<section class="page-header">
+		<div class="container">
+			<h1>Exclusivos</h1>
+			<p>Listado de propiedades exclusivas disponibles.</p>
+		</div>
+	</section>
+
+	<section class="catalogo-propiedades">
+		<div class="container">
+			<div class="titulo-seccion">
+				<h2>Propiedades Exclusivas</h2>
+			</div>
+
+			<!-- Botones para alternar vista -->
+			<div class="vista-toggle">
+				<button id="btn-grid" class="active" aria-label="Vista de cuadrícula" title="Vista de cuadrícula">
+					<i class="fas fa-th"></i>
+				</button>
+				<button id="btn-carrusel" aria-label="Vista de carrusel" title="Vista de carrusel">
+					<i class="fas fa-sliders-h"></i>
+				</button>
+			</div>
+
+			<!-- Vista Grid -->
+			<div class="propiedades-grid active">
+				<!-- muestra las propiedades consideradas "exclusivas" -->
+				<div class="propiedad-card" data-status="entrega-inmediata">
+					<div class="propiedad-imagen">
+						<img src="images/DSC07484-HDR.jpg" alt="Casa Ocasus">
+						<span class="propiedad-estado">Entrega Inmediata</span>
+					</div>
+					<div class="propiedad-info">
+						<h3>Casa Ocasus</h3>
+						<p class="propiedad-ubicacion">Condado del Obispo</p>
+						<div class="propiedad-specs">
+							<span><i class="fas fa-bed"></i> 3 habs</span>
+							<span><i class="fas fa-bath"></i> 3.5 baños</span>
+							<span><i class="fas fa-ruler-combined"></i> 390 m²</span>
+						</div>
+						<a href="Casa Ocasus.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+					</div>
+				</div>
+				
+				<div class="propiedad-card" data-status="en-construccion">
+					<div class="propiedad-imagen">
+						<img src="images/3.jpeg" alt="Casa La Reunión">
+						<span class="propiedad-estado">En Construcción</span>
+					</div>
+					<div class="propiedad-info">
+						<h3>Casa La Reunión</h3>
+						<p class="propiedad-ubicacion">Cerca de La Recolección</p>
+						<div class="propiedad-specs">
+							<span><i class="fas fa-bed"></i> 4 habs</span>
+							<span><i class="fas fa-bath"></i> 4 baños</span>
+							<span><i class="fas fa-ruler-combined"></i> 420 m²</span>
+						</div>
+						<a href="Casa La Reunión.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+					</div>
+				</div>
+				
+				<div class="propiedad-card" data-status="sobre-plano">
+					<div class="propiedad-imagen">
+						<img src="images/Structura x Casa N8-116.jpg" alt="Casa Reliqua">
+						<span class="propiedad-estado">Sobre Plano</span>
+					</div>
+					<div class="propiedad-info">
+						<h3>Casa Reliqua</h3>
+						<p class="propiedad-ubicacion">San Pedro El Alto</p>
+						<div class="propiedad-specs">
+							<span><i class="fas fa-bed"></i> 5 habs</span>
+							<span><i class="fas fa-bath"></i> 5 baños</span>
+							<span><i class="fas fa-ruler-combined"></i> 550 m²</span>
+						</div>
+						<a href="Casa Reliqua.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+					</div>
+				</div>
+
+				<!-- añadir o quitar exclusivos -->
+			</div>
+
+			<!-- Vista Carrusel -->
+			<div class="propiedades-carrusel">
+				<div class="swiper">
+					<div class="swiper-wrapper">
+						<div class="swiper-slide">
+							<div class="propiedad-card" data-status="entrega-inmediata">
+								<div class="propiedad-imagen">
+									<img src="images/DSC07484-HDR.jpg" alt="Casa Ocasus">
+									<span class="propiedad-estado">Entrega Inmediata</span>
+								</div>
+								<div class="propiedad-info">
+									<h3>Casa Ocasus</h3>
+									<p class="propiedad-ubicacion">Condado del Obispo</p>
+									<div class="propiedad-specs">
+										<span><i class="fas fa-bed"></i> 3 habs</span>
+										<span><i class="fas fa-bath"></i> 3.5 baños</span>
+										<span><i class="fas fa-ruler-combined"></i> 390 m²</span>
+									</div>
+									<a href="Casa Ocasus.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+								</div>
+							</div>
+						</div>
+						<div class="swiper-slide">
+							<div class="propiedad-card" data-status="en-construccion">
+								<div class="propiedad-imagen">
+									<img src="images/3.jpeg" alt="Casa La Reunión">
+									<span class="propiedad-estado">En Construcción</span>
+								</div>
+								<div class="propiedad-info">
+									<h3>Casa La Reunión</h3>
+									<p class="propiedad-ubicacion">Cerca de La Recolección</p>
+									<div class="propiedad-specs">
+										<span><i class="fas fa-bed"></i> 4 habs</span>
+										<span><i class="fas fa-bath"></i> 4 baños</span>
+										<span><i class="fas fa-ruler-combined"></i> 420 m²</span>
+									</div>
+									<a href="Casa La Reunión.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+								</div>
+							</div>
+						</div>
+						<div class="swiper-slide">
+							<div class="propiedad-card" data-status="sobre-plano">
+								<div class="propiedad-imagen">
+									<img src="images/Structura x Casa N8-116.jpg" alt="Casa Reliqua">
+									<span class="propiedad-estado">Sobre Plano</span>
+								</div>
+								<div class="propiedad-info">
+									<h3>Casa Reliqua</h3>
+									<p class="propiedad-ubicacion">San Pedro El Alto</p>
+									<div class="propiedad-specs">
+										<span><i class="fas fa-bed"></i> 5 habs</span>
+										<span><i class="fas fa-bath"></i> 5 baños</span>
+										<span><i class="fas fa-ruler-combined"></i> 550 m²</span>
+									</div>
+									<a href="Casa Reliqua.html" class="btn btn-primary-outline">Ver Más Detalles</a>
+								</div>
+							</div>
+						</div>
+						<!-- añadir o quitar exclusivos -->
+					</div>
+					<!-- Controles Swiper -->
+					<div class="swiper-pagination"></div>
+					<div class="swiper-button-prev"></div>
+					<div class="swiper-button-next"></div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!--parte inferiro de la pagina-->
+	<footer class="footer">
+		<div class="container footer-grid">
+			<!-- ...existing cols... -->
+			<div class="footer-col">
+				<img src="images/STRUCTURA LOGO VERTICAL BLANCO@3x.png" alt="Logo Structura Blanco" class="footer-logo">
+				<p>Diseño y construcción de casas estilo colonial en Antigua Guatemala. Creamos legados arquitectónicos.</p>
+			</div>
+			<div class="footer-col">
+				<h4>Enlaces Rápidos</h4>
+				<ul>
+					<li><a href="index.html">Inicio</a></li>
+					<li><a href="propiedades.html">Propiedades</a></li>
+					<li><a href="exclusivos.html">Exclusivos</a></li>
+					<li><a href="nosotros.html">Nosotros</a></li>
+				</ul>
+			</div>
+			<!-- resto del footer igual -->
+		</div>
+		<div class="footer-bottom">
+			<p>&copy; 2025 Structura. Todos los derechos reservados.</p>
+		</div>
+	</footer>
+
+	<!-- Script externo (filtrado + theme-toggle) -->
+	<script src="js/theme.js"></script>
+	<!-- Swiper JS para carrusel -->
+	<script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+	<script>
+		// Alternar entre grid y carrusel
+		const btnGrid = document.getElementById('btn-grid');
+		const btnCarrusel = document.getElementById('btn-carrusel');
+		const grid = document.querySelector('.propiedades-grid');
+		const carrusel = document.querySelector('.propiedades-carrusel');
+
+		btnGrid.addEventListener('click', () => {
+			btnGrid.classList.add('active');
+			btnCarrusel.classList.remove('active');
+			grid.classList.add('active');
+			carrusel.classList.remove('active');
+		});
+		btnCarrusel.addEventListener('click', () => {
+			btnCarrusel.classList.add('active');
+			btnGrid.classList.remove('active');
+			carrusel.classList.add('active');
+			grid.classList.remove('active');
+			// Inicializa Swiper solo si no existe
+			if (!window._swiperExclusivos) {
+				window._swiperExclusivos = new Swiper('.swiper', {
+					slidesPerView: 1,
+					centeredSlides: true,
+					loop: true,
+					spaceBetween: 24,
+					pagination: {
+						el: '.swiper-pagination',
+						clickable: true,
+					},
+					navigation: {
+						nextEl: '.swiper-button-next',
+						prevEl: '.swiper-button-prev',
+					},
+					breakpoints: {
+						640: { slidesPerView: 1 },
+						900: { slidesPerView: 2 },
+						1200: { slidesPerView: 3 }
+					}
+				});
+			}
+		});
+		// Inicializa Swiper si la vista carrusel está activa al cargar
+		document.addEventListener('DOMContentLoaded', function() {
+			if (carrusel.classList.contains('active') && !window._swiperExclusivos) {
+				btnCarrusel.click();
+			}
+		});
+	</script>
+
+<!--mauser para que funcionen los idiomas-->
+<script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'es',
+      includedLanguages: 'en,zh-CN,hi,es,ar,bn,pt,ru,ja,fr',
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    }, 'google_translate_element');
+  }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+  <!--Detecta si hay idioma guardado en la cookie y lo reaplica -->
+<script>
+  (function () {
+    const match = document.cookie.match(/googtrans=\/[a-zA-Z-]+\/([a-zA-Z-]+)/);
+    if (match) {
+      const lang = match[1];
+      document.cookie = `googtrans=/es/${lang};path=/`;
+    }
+  })();
+</script>
+
+<!--mauser de la cosa esa del boton flotante de WhatsApp-->
+<a href="https://wa.me/502XXXXXXXX?text=Hola%20STRUCTURA,%20me%20interesa%20una%20propiedad" 
+   class="whatsapp-float" target="_blank" aria-label="Contáctanos por WhatsApp">
+  <i class="fab fa-whatsapp"></i>
+</a> 
+
+<!--mauser del boton flotante S-->
+<a href="index.html" class="boton-flotante" aria-label="Ir a la página principal">
+  <span class="notranslate" translate="no">S</span>
+</a>
+
+</body>
+</html>
